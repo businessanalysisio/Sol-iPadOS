@@ -10,6 +10,10 @@ public final class WorkspaceViewModel {
     public private(set) var documents: [Document] = []
     public private(set) var trashItems: [TrashItem] = []
     public private(set) var backing: WorkspaceLocation.Backing
+    public private(set) var syncStatus: SyncStatus = .upToDate
+    /// Unresolved conflict banners (APP-FR-11) — resolver already made the
+    /// copies; these wait for the user to view or dismiss.
+    public private(set) var conflicts: [ConflictEvent] = []
     public var layout: Layout = .grid
     public var query: String = "" { didSet { refreshList() } }
     public var paletteVisible = false
@@ -18,14 +22,25 @@ public final class WorkspaceViewModel {
 
     /// Exposed so the app layer can hand the same store to the editor.
     public let store: DocumentStore
+    private let syncEngine: SyncEngine?
 
-    public init(store: DocumentStore, backing: WorkspaceLocation.Backing) {
+    public init(store: DocumentStore, backing: WorkspaceLocation.Backing,
+                syncEngine: SyncEngine? = nil) {
         self.store = store
         self.backing = backing
+        self.syncEngine = syncEngine
+        if let engine = syncEngine {
+            syncStatus = engine.status
+            engine.onStatusChange = { [weak self] status in
+                Task { @MainActor in self?.syncStatus = status }
+            }
+            engine.start()
+        }
         refreshList()
     }
 
-    /// Production entry point: resolve location (APP-FR-15), open store.
+    /// Production entry point: resolve location (APP-FR-15), open store,
+    /// attach the iCloud sync engine when the container backs the workspace.
     public static func bootstrap() throws -> WorkspaceViewModel {
         let local = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("SolWorkspace", isDirectory: true)
@@ -33,7 +48,19 @@ public final class WorkspaceViewModel {
             ubiquity: DefaultUbiquityProvider(), localRoot: local)
         let dbURL = location.root.appendingPathComponent(".sol-index.sqlite")
         let store = try DocumentStore(root: location.root, index: SearchIndex(databaseURL: dbURL))
-        return WorkspaceViewModel(store: store, backing: location.backing)
+        let engine: SyncEngine? = location.backing == .iCloud ? ICloudSyncEngine() : nil
+        return WorkspaceViewModel(store: store, backing: location.backing, syncEngine: engine)
+    }
+
+    // MARK: Conflicts (APP-FR-11 — banner + multi-window resolve, M-01)
+
+    public func reportConflict(_ event: ConflictEvent) {
+        conflicts.append(event)
+        refreshList() // the copy is a new, badged document
+    }
+
+    public func dismissConflict(_ event: ConflictEvent) {
+        conflicts.removeAll { $0.id == event.id }
     }
 
     // MARK: Actions (each maps to a Phụ lục A command or S1 control)
@@ -60,9 +87,20 @@ public final class WorkspaceViewModel {
         perform {}
     }
 
-    /// Sync chip per M-02: M1–M3 the chip only ever says "Đã lưu cục bộ"
-    /// (never claims iCloud state it cannot verify — G3). M4 adds real states.
-    public var chipText: String { "Đã lưu cục bộ" }
+    /// Sync chip — M4 unlocks the three real states (M-02 phase policy ends
+    /// here). Still honest: local-fallback workspaces and engine-less iCloud
+    /// never claim sync state they cannot verify (G3 / APP-AC-05).
+    public var chipText: String {
+        guard case .iCloud = backing, syncEngine != nil else { return "Đã lưu cục bộ" }
+        switch syncStatus {
+        case .upToDate: return "Đã đồng bộ"
+        case .syncing(let n): return "Đang đồng bộ \(n) thay đổi…"
+        case .offline: return "Ngoại tuyến — sẽ đồng bộ khi có mạng"
+        }
+    }
+
+    /// Dot color state for SolStatusChip.
+    public var chipDot: SyncStatus { syncEngine == nil ? .upToDate : syncStatus }
 
     /// Banner for local-fallback mode (APP-FR-15).
     public var fallbackNotice: String? {

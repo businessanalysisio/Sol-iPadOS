@@ -14,10 +14,20 @@ public struct WorkspaceView: View {
         self.onOpen = onOpen
     }
 
+    @Environment(\.openWindow) private var openWindow
+
+    private var chipState: SolSyncState {
+        switch model.chipDot {
+        case .upToDate: .synced
+        case .syncing: .syncing
+        case .offline: .offline
+        }
+    }
+
     public var body: some View {
         VStack(spacing: 0) {
-            SolAppBar(title: "Sol Workspace", crumb: model.chipText.isEmpty ? nil : nil) {
-                SolStatusChip(model.chipText, state: .synced)
+            SolAppBar(title: "Sol Workspace", crumb: nil) {
+                SolStatusChip(model.chipText, state: chipState)
                 Button("⌘K") { model.paletteVisible.toggle() }
                     .font(SolFont.label()).foregroundStyle(SolColor.textSecondary)
                     .keyboardShortcut("k", modifiers: .command)
@@ -33,6 +43,24 @@ public struct WorkspaceView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(Sol.Spacing.m)
                     .background(SolColor.warningTint)
+            }
+
+            // APP-FR-11: conflict banners — always name the copy file; "Xem
+            // bản sao" opens original here + copy in a NEW window (the M-01
+            // official resolve flow rides APP-FR-02 multi-window).
+            ForEach(model.conflicts) { event in
+                SolConflictBanner(
+                    message: (try? AttributedString(markdown:
+                        "**Xung đột iCloud:** thiết bị của \(event.actorName) đã sửa file này. Bản của bạn được giữ; bản kia lưu thành **“\(event.copy.url.lastPathComponent)”** — mọi phiên bản phát hiện được đều được bảo toàn."))
+                        ?? AttributedString("Xung đột iCloud: \(event.copy.url.lastPathComponent)"),
+                    primaryAction: ("Xem bản sao", {
+                        openWindow(value: event.copy)
+                        onOpen(event.original)
+                        model.dismissConflict(event)
+                    }),
+                    dismissAction: ("Đóng", { model.dismissConflict(event) })
+                )
+                .padding(.horizontal, Sol.Spacing.l).padding(.top, Sol.Spacing.s)
             }
 
             listTools
@@ -85,12 +113,14 @@ public struct WorkspaceView: View {
                 LazyVGrid(columns: columns, spacing: Sol.Spacing.m) {
                     ForEach(model.documents) { doc in
                         Button { onOpen(doc) } label: {
-                            SolDocumentCard(fileTag: ".MD",
-                                            title: doc.title,
-                                            meta: doc.modifiedAt.formatted(date: .abbreviated, time: .shortened))
+                            SolDocumentCard(
+                                fileTag: doc.isConflictCopy ? ".MD · BẢN SAO XUNG ĐỘT" : ".MD",
+                                title: doc.title,
+                                meta: doc.modifiedAt.formatted(date: .abbreviated, time: .shortened))
                         }
                         .buttonStyle(.plain)
                         .contextMenu {
+                            Button("Mở trong cửa sổ mới") { openWindow(value: doc) }
                             Button("Xóa (vào Thùng rác)", role: .destructive) {
                                 model.softDelete(doc)
                             }

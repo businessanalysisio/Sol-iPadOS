@@ -3,7 +3,7 @@ import Foundation
 /// A markdown document in the workspace. Identity = stable UUID kept in a
 /// sidecar (survives rename/move); the file itself stays a plain `.md` any
 /// app can open (APP-FR-10).
-public struct Document: Identifiable, Equatable, Hashable {
+public struct Document: Identifiable, Equatable, Hashable, Codable {
     public let id: String
     public var url: URL
     public var title: String { url.deletingPathExtension().lastPathComponent }
@@ -108,7 +108,10 @@ public final class DocumentStore {
         let ids = try index.search(text)
         let all = try listDocuments()
         let byID = Dictionary(uniqueKeysWithValues: all.map { ($0.id, $0) })
-        return ids.compactMap { byID[$0] }
+        let hits = ids.compactMap { byID[$0] }
+        // M-01: conflicted copies stay indexed (G2) but group AFTER originals
+        // so near-duplicate pairs don't mislead — the UI badges them too.
+        return hits.filter { !$0.isConflictCopy } + hits.filter(\.isConflictCopy)
     }
 
     // MARK: Trash — APP-FR-17
