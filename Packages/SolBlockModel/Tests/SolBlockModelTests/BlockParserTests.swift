@@ -90,7 +90,7 @@ final class BlockParserTests: XCTestCase {
     func testDiffRangeConfinesSingleLineEdit() {
         let doc = BlockDocument(text: "# tiêu đề\nđoạn một\nđoạn hai\n- item")
         doc.replaceAll(with: "# tiêu đề\nđoạn một đã sửa\nđoạn hai\n- item")
-        XCTAssertEqual(doc.changedLines, 1..<1) // tag unchanged (P→P): nothing to redraw
+        XCTAssertTrue(doc.changedLines.isEmpty) // tag unchanged (P→P): nothing to redraw
         doc.replaceAll(with: "# tiêu đề\n## đoạn một đã sửa\nđoạn hai\n- item")
         XCTAssertEqual(doc.changedLines, 1..<2) // P→H2: exactly one gutter line
     }

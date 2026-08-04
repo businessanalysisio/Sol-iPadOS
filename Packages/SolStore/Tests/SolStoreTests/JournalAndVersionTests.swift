@@ -71,7 +71,14 @@ final class JournalAndVersionTests: XCTestCase {
         let doc = try store.createDocument(named: "Đặc tả", contents: "nội dung")
         let url = try store.exportSnapshot(of: doc, actor: "iPad của Sol")
 
-        XCTAssertTrue(url.lastPathComponent.hasPrefix("Đặc tả-snapshot-2026-"))
+        // Expected stamp derives from the injected clock — same formatter as
+        // the store (never hardcode a year: the first version of this test
+        // assumed 2026 while the fake epoch is 2025).
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(identifier: "UTC")
+        f.dateFormat = "yyyy-MM-dd-HHmmss"
+        XCTAssertEqual(url.lastPathComponent, "Đặc tả-snapshot-\(f.string(from: clock)).md")
         XCTAssertEqual(try String(contentsOf: url, encoding: .utf8), "nội dung")
         XCTAssertEqual(try store.versions.list(docID: doc.id).first?.operation, .snapshot)
     }
