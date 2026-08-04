@@ -34,7 +34,7 @@ Design implications used throughout this system:
 | `gray.300` | `#DADEE2` | Gray 300 |
 | `gray.100` | `#F3F4F6` | Gray 100 |
 
-Derived (documented, not brand-invented): `line.warm #EAE0D3` (border on cream), `surface.dark #241C16`, `line.dark #3A2E24` — warm neutrals interpolated between cream/charcoal for UI chrome. Flag to PO in the next brand review.
+Derived (documented, not brand-invented): `line.warm #EAE0D3` (border on cream), `surface.dark #241C16`, `line.dark #3A2E24` — warm neutrals interpolated between cream/charcoal for UI chrome. **PO-approved 04/08/2026 (HR-6) — official system tokens.**
 
 ### 2.2 Semantic tokens
 
@@ -56,7 +56,7 @@ Derived (documented, not brand-invented): `line.warm #EAE0D3` (border on cream),
 
 `#D85A0B → #FF8A00 → #8F3408 → #384152 → #6B7280`. Bar gradient: `linear(180°, #FF8A00, #D85A0B)`. Axis/baseline: `text.primary`. Never use accent orange for both a selected UI state and a chart series in the same view — charts win, UI falls back to `gray.700`.
 
-### 2.4 Presence palette (functional extension — needs PO sign-off)
+### 2.4 Presence palette (functional extension — **PO-approved 04/08/2026, HR-6**)
 
 Peer cursors/avatars must be distinguishable from `accent`: self = orange.core, peer-1 = slate `#384152`, peer-2 = violet `#7C6BD9`, peer-3 = teal `#2E7D74`. Selection tints at 18% alpha.
 
@@ -127,6 +127,7 @@ Dark = **warm**: gray.900 base, charcoal surfaces, warm borders; accent shifts o
 
 ## 10. Open items
 
-1. PO sign-off: presence palette (§2.4) and derived warm neutrals (§2.1).
-2. Confirm licensed availability of "Inter Mono" (guideline mentions it; fallback chain defined in §3).
+1. ~~PO sign-off: presence palette (§2.4) and derived warm neutrals (§2.1)~~ — ✅ **RESOLVED 04/08/2026 (HR-6): approved as specified.**
+2. Confirm licensed availability of "Inter Mono" (guideline mentions it; fallback chain SF Mono defined in §3 — app ships fine either way).
 3. Marketing surfaces (site, App Store) may use photography/illustration styles from the guideline — out of scope for this app spec.
+4. Amend the Brand Guideline PDF for ADR-D08 (Be Vietnam Pro) — marketing-side, tracked since HR-1.
