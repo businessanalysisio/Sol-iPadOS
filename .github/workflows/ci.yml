@@ -5,25 +5,23 @@ on:
 
 jobs:
   test:
-    runs-on: macos-14
+    runs-on: macos-15 # default Xcode 16.x — reads XcodeGen's project format 77
     steps:
       - uses: actions/checkout@v4
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app
       - name: Generate project
         run: |
           brew install xcodegen
           xcodegen generate
       # Snapshot baselines are device-specific: pin the HR-4 reference device.
+      # pipefail is load-bearing: without it a failing xcodebuild piped anywhere
+      # reports success (the false-green this workflow shipped with once).
       - name: Run tests (iPad 10th gen — HR-4 reference device)
         run: |
+          set -o pipefail
           xcodebuild test \
             -scheme Sol \
             -destination 'platform=iOS Simulator,name=iPad (10th generation)' \
-            -resultBundlePath TestResults \
-            | xcbeautify || xcodebuild test \
-            -scheme Sol \
-            -destination 'platform=iOS Simulator,name=iPad (10th generation)'
+            -resultBundlePath TestResults
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4
