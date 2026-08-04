@@ -83,11 +83,22 @@ struct MarkdownTextView: UIViewRepresentable {
                     lineIndex: lineIndex,
                     y: frame.origin.y + tv.textContainerInset.top,
                     height: frame.height))
-                // A layout fragment covers one paragraph; count its newlines.
+                // A layout fragment covers one paragraph element; advance the
+                // logical-line counter by the newlines it spans (offset math —
+                // NSTextContentManager has no attributedString(in:) accessor).
                 if let paragraph = fragment.textElement,
                    let range = paragraph.elementRange {
-                    let s = contentManager.attributedString(in: range)?.string ?? "\n"
-                    lineIndex += max(1, s.filter { $0 == "\n" }.count)
+                    let start = contentManager.offset(
+                        from: layoutManager.documentRange.location, to: range.location)
+                    let end = contentManager.offset(
+                        from: layoutManager.documentRange.location, to: range.endLocation)
+                    if start >= 0, end > start, end <= (tv.text as NSString).length {
+                        let s = (tv.text as NSString).substring(
+                            with: NSRange(location: start, length: end - start))
+                        lineIndex += max(1, s.filter { $0 == "\n" }.count)
+                    } else {
+                        lineIndex += 1
+                    }
                 } else {
                     lineIndex += 1
                 }
