@@ -12,6 +12,20 @@ jobs:
         run: |
           brew install xcodegen
           xcodegen generate
+      # Some macos-15 image variants ship WITHOUT the iOS simulator runtime
+      # (run 30880408413 had zero iOS destinations). Create the HR-4 reference
+      # device explicitly instead of hoping the image includes it.
+      - name: Prepare iOS simulator (HR-4 reference device)
+        run: |
+          set -o pipefail
+          if ! xcrun simctl list runtimes | grep -q "^iOS"; then
+            echo "No iOS runtime on this image — downloading (adds a few minutes)"
+            sudo xcodebuild -downloadPlatform iOS
+          fi
+          RUNTIME=$(xcrun simctl list runtimes | awk '/^iOS/ {id=$NF} END {print id}')
+          echo "Using runtime: $RUNTIME"
+          xcrun simctl create "iPad10-CI" \
+            "com.apple.CoreSimulator.SimDeviceType.iPad-10th-generation" "$RUNTIME"
       # Snapshot baselines are device-specific: pin the HR-4 reference device.
       # pipefail is load-bearing: without it a failing xcodebuild piped anywhere
       # reports success (the false-green this workflow shipped with once).
@@ -20,7 +34,7 @@ jobs:
           set -o pipefail
           xcodebuild test \
             -scheme Sol \
-            -destination 'platform=iOS Simulator,name=iPad (10th generation)' \
+            -destination 'platform=iOS Simulator,name=iPad10-CI' \
             -resultBundlePath TestResults
       - name: Upload test results
         if: failure()
