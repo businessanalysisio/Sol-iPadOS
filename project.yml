@@ -9,6 +9,10 @@ options:
 packages:
   SolDesignSystem:
     path: Packages/SolDesignSystem
+  SolStore:
+    path: Packages/SolStore
+  SolWorkspace:
+    path: Packages/SolWorkspace
 
 targets:
   Sol:
@@ -18,6 +22,15 @@ targets:
     sources: [App]
     dependencies:
       - package: SolDesignSystem
+      - package: SolWorkspace
+    entitlements:
+      path: App/Sol.entitlements
+      properties:
+        com.apple.developer.icloud-container-identifiers:
+          - iCloud.vn.io.sol
+        com.apple.developer.icloud-services: [CloudDocuments]
+        com.apple.developer.ubiquity-container-identifiers:
+          - iCloud.vn.io.sol
     settings:
       base:
         TARGETED_DEVICE_FAMILY: "2"          # iPad-only (PRD v1.2 §2)
@@ -36,3 +49,5 @@ schemes:
     test:
       targets:
         - package: SolDesignSystem/SolDesignSystemTests
+        - package: SolStore/SolStoreTests
+        - package: SolWorkspace/SolWorkspaceTests
