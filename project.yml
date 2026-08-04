@@ -1,0 +1,38 @@
+# XcodeGen manifest — run `xcodegen generate` on a Mac to produce Sol.xcodeproj.
+name: Sol
+options:
+  bundleIdPrefix: vn.io.sol
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+packages:
+  SolDesignSystem:
+    path: Packages/SolDesignSystem
+
+targets:
+  Sol:
+    type: application
+    platform: iOS
+    supportedDestinations: [iOS]
+    sources: [App]
+    dependencies:
+      - package: SolDesignSystem
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "2"          # iPad-only (PRD v1.2 §2)
+        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown"
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES  # multi-window (APP-FR-02)
+        GENERATE_INFOPLIST_FILE: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 0.1.0
+        SWIFT_VERSION: "5.9"
+
+schemes:
+  Sol:
+    build:
+      targets: { Sol: all }
+    test:
+      targets:
+        - package: SolDesignSystem/SolDesignSystemTests

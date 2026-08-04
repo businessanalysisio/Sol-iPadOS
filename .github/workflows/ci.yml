@@ -1,0 +1,32 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+
+jobs:
+  test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+      - name: Generate project
+        run: |
+          brew install xcodegen
+          xcodegen generate
+      # Snapshot baselines are device-specific: pin the HR-4 reference device.
+      - name: Run tests (iPad 10th gen — HR-4 reference device)
+        run: |
+          xcodebuild test \
+            -scheme Sol \
+            -destination 'platform=iOS Simulator,name=iPad (10th generation)' \
+            -resultBundlePath TestResults \
+            | xcbeautify || xcodebuild test \
+            -scheme Sol \
+            -destination 'platform=iOS Simulator,name=iPad (10th generation)'
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults
