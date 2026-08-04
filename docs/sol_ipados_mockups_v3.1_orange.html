@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sol – The Analyst's Workspace · iPadOS Mockups v3.1 (Sol Orange · Be Vietnam Pro)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* design.md §2 — semantic tokens (light) */
+  --accent:#D85A0B; --sunrise:#FF8A00; --burnt:#8F3408;
+  --bg:#F8F2EA; --surface:#FFFFFF; --surface-alt:#F3F4F6;
+  --ink:#2B211B; --muted:#6B7280; --line:#EAE0D3;
+  --g900:#191512; --slate:#384152; --violet:#7C6BD9;
+  --positive:#3B7A3F; --danger:#C2452F;
+  --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:var(--ink);
+  background:radial-gradient(circle at 78% -12%, rgba(216,90,11,.30), transparent 42%),
+             radial-gradient(circle at 8% 110%, rgba(255,138,0,.10), transparent 38%),
+             #191512;
+  min-height:100vh;padding:32px 20px 56px}
+h1,h2,h3{font-family:'Be Vietnam Pro',sans-serif}
+
+/* ===== page header (dark charcoal + orbit rings) ===== */
+.hdr{max-width:1180px;margin:0 auto 22px;color:#F3EBE0;display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;justify-content:space-between;position:relative}
+.hdr .rings{position:absolute;right:-8px;top:-26px;width:120px;height:120px;opacity:.5;pointer-events:none}
+.hdr h1{font-size:22px;font-weight:600}.hdr h1 .dot{color:var(--sunrise)}
+.hdr p{font-size:13px;color:#B9A895;margin-top:4px}
+.controls{display:flex;gap:10px;flex-wrap:wrap}
+.tab,.toggle{border:1px solid rgba(243,235,224,.25);background:transparent;color:#F3EBE0;font:500 13px 'Inter',sans-serif;padding:8px 14px;border-radius:999px;cursor:pointer;transition:.18s}
+.tab:hover{border-color:var(--sunrise)}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#FFF7EF}
+.tab:focus-visible,.toggle:focus-visible,button:focus-visible{outline:2px solid var(--sunrise);outline-offset:2px}
+
+/* ===== iPad frame ===== */
+.stage{max-width:1180px;margin:0 auto}
+.ipad{background:#111417;border-radius:34px;padding:16px;box-shadow:0 30px 80px rgba(0,0,0,.55), inset 0 0 0 2px #2A2F33}
+.screen{border-radius:20px;overflow:hidden;background:var(--bg);aspect-ratio:4/2.9;display:flex;flex-direction:column;position:relative}
+.statusbar{height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font:600 11px 'Inter',sans-serif;flex:none}
+.statusbar .r{display:flex;gap:6px;align-items:center}
+.batt{width:20px;height:9px;border:1px solid currentColor;border-radius:3px;position:relative}
+.batt::after{content:"";position:absolute;inset:1px 5px 1px 1px;background:var(--accent);border-radius:1px}
+.view{display:none;flex:1;min-height:0;flex-direction:column}
+.view.on{display:flex}
+
+/* ===== shared chrome ===== */
+.appbar{height:44px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);flex:none;background:var(--surface)}
+.logo{width:24px;height:24px;border-radius:8px;background:linear-gradient(160deg,var(--sunrise),var(--accent));display:grid;place-items:center;color:#fff;font:700 12px 'Be Vietnam Pro',sans-serif}
+.appbar .title{font:600 14px 'Be Vietnam Pro',sans-serif}
+.appbar .crumb{font-size:12px;color:var(--muted)}
+.appbar .spacer{flex:1}
+.chip{font:500 11px 'Inter',sans-serif;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);display:flex;align-items:center;gap:6px;background:transparent;cursor:pointer}
+.chip .st{width:7px;height:7px;border-radius:50%;background:var(--positive)}
+.chip.off .st{background:#9AA3AE}.chip.syncing .st{background:var(--sunrise);animation:blink 1s infinite}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:9px;font:600 12px 'Inter',sans-serif;padding:7px 13px;cursor:pointer}
+.btn:active{background:var(--burnt)}
+.ic{width:26px;height:26px;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:12px;background:transparent;cursor:pointer}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{padding:4px 10px;font:500 11px 'Inter',sans-serif;color:var(--muted);background:transparent;border:none;cursor:pointer}
+.seg button.on{background:var(--ink);color:#FFF7EF}
+
+/* ===== workspace ===== */
+.cols{display:flex;flex:1;min-height:0}
+.side{width:210px;flex:none;border-right:1px solid var(--line);background:var(--bg);padding:12px 10px;overflow:auto}
+.side .sec{font:600 10px 'Inter',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:12px 6px 6px}
+.node{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-size:12.5px;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;color:var(--ink);font-family:'Inter',sans-serif}
+.node.sel{background:rgba(216,90,11,.13);color:var(--burnt);font-weight:600}
+.node .ind{width:12px}
+.doclist{flex:1;min-width:0;display:flex;flex-direction:column;position:relative;background:var(--surface)}
+.listtools{display:flex;align-items:center;gap:8px;padding:12px 16px 4px}
+.listtools h2{font-size:16px;font-weight:600;flex:1}
+.search{border:1px solid var(--line);border-radius:9px;padding:6px 10px;font:400 12px 'Inter',sans-serif;width:190px;background:var(--surface);color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;padding:12px 16px;overflow:auto;align-content:start}
+.grid.list{grid-template-columns:1fr;gap:8px}
+.card{border:1px solid var(--line);border-radius:12px;padding:11px;background:var(--surface);transition:.15s;cursor:pointer}
+.card:hover{border-color:var(--accent);box-shadow:0 4px 14px rgba(143,52,8,.10)}
+.card .ft{font:600 10px var(--mono);color:var(--burnt);letter-spacing:.05em}
+.card h3{font-size:12.5px;font-weight:600;margin:5px 0 6px;line-height:1.3}
+.mini{font:400 8.5px var(--mono);color:var(--muted);line-height:1.55;height:52px;overflow:hidden;border-top:1px dashed var(--line);padding-top:6px}
+.grid.list .mini{display:none}
+.grid.list .card{display:flex;align-items:center;gap:12px}
+.grid.list .card h3{margin:0;flex:1}
+.card .meta{display:flex;justify-content:space-between;gap:10px;font-size:9.5px;color:var(--muted);margin-top:8px}
+.grid.list .card .meta{margin-top:0}
+.badge{background:rgba(216,90,11,.14);color:var(--burnt);border-radius:999px;padding:1px 7px;font-weight:600}
+.empty{padding:36px 16px;text-align:center;color:var(--muted);font-size:12px;display:none;
+  background:radial-gradient(rgba(216,90,11,.35) 1px, transparent 1.4px);background-size:18px 18px;background-position:center}
+.empty b{display:block;font:600 13px 'Be Vietnam Pro',sans-serif;color:var(--ink);margin-bottom:4px}
+
+/* command palette */
+.overlay{position:absolute;inset:0;background:rgba(25,21,18,.38);backdrop-filter:blur(2px);display:none;align-items:flex-start;justify-content:center;padding-top:60px;z-index:30}
+.overlay.on{display:flex}
+.palette{width:380px;background:var(--surface);border-radius:14px;box-shadow:0 20px 60px rgba(25,21,18,.4);overflow:hidden}
+.palette input{width:100%;border:none;border-bottom:1px solid var(--line);padding:12px 14px;font:500 13px 'Inter',sans-serif;outline:none;color:var(--ink);background:var(--surface)}
+.palette .cmd{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:12px;cursor:pointer}
+.palette .cmd:hover{background:rgba(216,90,11,.10)}
+.palette .cmd .kk{margin-left:auto;font:600 9px var(--mono);color:var(--muted)}
+
+/* ===== editor ===== */
+.edwrap{flex:1;display:flex;min-height:0;background:var(--surface)}
+.pane{flex:1;min-width:0;display:flex;flex-direction:column}
+.pane.hide{display:none}
+.panehead{height:30px;flex:none;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--line);font:600 10px 'Inter',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.panehead .sync{margin-left:auto;color:var(--burnt);letter-spacing:0;text-transform:none;font-weight:500}
+.split{width:1px;background:var(--line);flex:none}
+.edbody{flex:1;overflow:hidden;display:flex}
+.gutter{width:34px;flex:none;background:var(--surface-alt);border-right:1px solid var(--line);padding:12px 0;overflow:hidden;text-align:center;font:600 8px var(--mono);color:#A79A88}
+.gutter div{height:19.25px;line-height:19.25px}
+.gutter .gh{color:var(--accent)}
+textarea.src{flex:1;border:none;resize:none;outline:none;padding:12px 14px;font-family:var(--mono);font-size:11px;line-height:1.75;color:var(--ink);background:transparent;white-space:pre;overflow:auto}
+.prev{flex:1;overflow:auto;padding:16px 20px}
+.prev h1{font-size:17px;margin:0 0 2px}
+.prev h2{font-size:13.5px;margin:14px 0 6px;padding-left:8px;border-left:3px solid var(--accent)}
+.prev p,.prev li{font-size:11.5px;line-height:1.65;margin:4px 0}
+.prev ul{padding-left:18px;margin:4px 0}
+.prev blockquote{border-left:3px solid var(--line);background:var(--bg);padding:7px 10px;border-radius:0 8px 8px 0;font-size:11px;color:#4A3D33;margin:8px 0}
+.prev code{font:600 10px var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:0 4px;color:var(--burnt)}
+table.spec{width:100%;border-collapse:collapse;font-size:10.5px;margin:6px 0}
+table.spec th{background:var(--burnt);color:#F8F2EA;font:600 9.5px 'Inter',sans-serif;text-align:left;padding:5px 8px}
+table.spec td{border:1px solid var(--line);padding:5px 8px}
+table.spec tr:nth-child(even) td{background:var(--bg)}
+kbd{font:600 9px var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--muted)}
+.toolbar{height:34px;flex:none;border-top:1px solid var(--line);display:flex;align-items:center;gap:4px;padding:0 10px;background:var(--surface-alt)}
+.tk{min-width:26px;height:24px;border:1px solid var(--line);background:var(--surface);border-radius:7px;display:grid;place-items:center;font:600 10.5px var(--mono);color:var(--ink);padding:0 6px;cursor:pointer}
+.tk.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.toolbar .hint{margin-left:auto;font-size:10px;color:var(--muted)}
+
+/* charts — ramp design.md §2.3 */
+.chart{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;background:var(--surface)}
+.chart .ct{font:600 11px 'Be Vietnam Pro',sans-serif;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.chart .ct .tag{font:600 8.5px var(--mono);color:var(--burnt);background:rgba(216,90,11,.12);padding:2px 7px;border-radius:999px}
+.bars{display:flex;align-items:flex-end;gap:14px;height:96px;padding:0 6px;border-bottom:1.5px solid var(--ink)}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;justify-content:flex-end;height:100%}
+.bar i{display:block;width:70%;background:linear-gradient(180deg,#FF8A00,#D85A0B);border-radius:5px 5px 0 0;transition:height .35s}
+.bar b{font:600 9px var(--mono);color:var(--burnt)}
+.xl{display:flex;gap:14px;padding:4px 6px 0}
+.xl span{flex:1;text-align:center;font:500 9px 'Inter',sans-serif;color:var(--muted)}
+.pie{display:flex;align-items:center;gap:16px;padding:6px}
+.pie .disc{width:110px;height:110px;border-radius:50%;flex:none}
+.legend{font-size:10.5px;display:grid;gap:5px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+svg.linec{width:100%;height:120px;display:block}
+
+/* collab — presence palette design.md §2.4 */
+.live{display:flex;align-items:center;gap:5px;font:600 10px 'Inter',sans-serif;color:var(--danger)}
+.live .pulse{width:7px;height:7px;border-radius:50%;background:var(--danger);animation:blink 1.4s infinite}
+.roster{display:flex;align-items:center;margin-left:6px}
+.av{width:22px;height:22px;border-radius:50%;border:2px solid var(--surface);display:grid;place-items:center;font:700 9px 'Inter',sans-serif;color:#fff;margin-left:-6px}
+.av.me{background:var(--accent)}.av.p1{background:var(--slate)}.av.p2{background:var(--violet)}
+.colsrc{flex:1;overflow:auto;padding:12px 14px;font-family:var(--mono);font-size:11px;line-height:1.75;white-space:pre-wrap}
+.colsrc .md{color:#A79A88}.colsrc .h{color:var(--burnt);font-weight:700}.colsrc .b{font-weight:700}
+.cursor{position:relative;display:inline}
+.cursor .bar-c{display:inline-block;width:2px;height:13px;vertical-align:-2px;animation:blink 1.1s steps(1) infinite}
+.cursor .name{position:absolute;top:-16px;left:0;font:600 8px 'Inter',sans-serif;color:#fff;border-radius:4px 4px 4px 0;padding:1.5px 6px;white-space:nowrap}
+.c-p1 .bar-c{background:var(--slate)}.c-p1 .name{background:var(--slate)}
+.c-p2 .bar-c{background:var(--violet)}.c-p2 .name{background:var(--violet)}
+.sel-p1{background:rgba(56,65,82,.18);border-radius:2px}
+@keyframes blink{50%{opacity:0}}
+.sheet{position:absolute;right:14px;top:50px;width:230px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 44px rgba(25,21,18,.25);padding:14px;z-index:20;display:none}
+.sheet.on{display:block}
+.sheet h3{font-size:12.5px;margin-bottom:8px}
+.sheet .row{display:flex;align-items:center;gap:8px;font-size:11px;padding:5px 0;color:var(--ink)}
+.sheet .row .kk{margin-left:auto;font:600 9px var(--mono);color:var(--muted)}
+
+/* split view / conflict */
+.mt{flex:1;display:flex;min-height:0;background:#0B0D0F;gap:4px;padding:4px}
+.mt .win{background:var(--surface);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-width:0;transition:flex .3s}
+.mt .fake{flex:1;background:var(--bg);display:flex;flex-direction:column}
+.fake .fbar{height:34px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:0 12px;font-size:11px;color:var(--muted)}
+.fake .furl{flex:1;background:var(--bg);border-radius:7px;padding:5px 10px;font-size:10.5px}
+.fake .fbody{flex:1;display:grid;place-items:center}
+.vidgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px;width:100%;height:100%}
+.vid{background:#20262B;border-radius:10px;display:grid;place-items:center;color:#fff;font:600 12px 'Inter',sans-serif;position:relative}
+.vid .nm{position:absolute;left:8px;bottom:6px;font:500 9px 'Inter',sans-serif;color:#C8CFCB}
+.banner{margin:10px 12px 0;border:1px solid rgba(255,138,0,.55);background:rgba(255,138,0,.12);border-radius:10px;padding:8px 10px;font-size:10.5px;display:flex;gap:8px;align-items:center;color:var(--ink)}
+.banner b{font-weight:600}
+.banner button{border:none;background:var(--sunrise);color:#3A2000;border-radius:7px;font:600 10px 'Inter',sans-serif;padding:4px 9px;cursor:pointer}
+.banner .ghost{background:transparent;color:var(--burnt);border:1px solid rgba(216,90,11,.5)}
+.toast{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:var(--g900);color:#F3EBE0;font-size:11px;border-radius:999px;padding:8px 16px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:40}
+.toast.on{opacity:1}
+.mtdoc{flex:1;overflow:auto;padding:12px 16px}
+.mtdoc h2{font-size:13px;margin:0 0 6px;padding-left:8px;border-left:3px solid var(--accent)}
+.mtdoc p,.mtdoc li{font-size:11px;line-height:1.6}
+
+/* ===== S6 Thùng rác (CR-M1) ===== */
+.trlist{flex:1;overflow:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.trsec{font:600 10px 'Inter',sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:8px 2px 0}
+.trow{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+.trow .nm{flex:1;min-width:0}
+.trow .nm b{font-size:12.5px;display:block;font-weight:600}
+.trow .nm span{font-size:10.5px;color:var(--muted)}
+.trow .nm .exp{color:var(--burnt);font-weight:600}
+.btn.ghostd{background:transparent;color:var(--danger);border:1px solid rgba(194,69,47,.45)}
+.cbadge{background:rgba(255,138,0,.16);color:var(--burnt);border-radius:999px;padding:1px 7px;font:600 8.5px 'Inter',sans-serif;letter-spacing:.03em}
+.trempty{padding:40px 16px;text-align:center;color:var(--muted);font-size:12px;
+  background:radial-gradient(rgba(216,90,11,.35) 1px, transparent 1.4px);background-size:18px 18px;background-position:center}
+.trempty b{display:block;font:600 13px 'Be Vietnam Pro',sans-serif;color:var(--ink);margin-bottom:4px}
+.confirmbox{width:430px;background:var(--surface);border-radius:14px;box-shadow:0 20px 60px rgba(25,21,18,.4);padding:16px}
+.confirmbox h3{font-size:14px;margin-bottom:8px}
+.confirmbox p{font-size:11.5px;line-height:1.65;color:var(--muted)}
+.confirmbox .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.dark .trow{background:#241C16;border-color:#3A2E24}
+.dark .trow .nm b{color:#F7EFE3}
+.dark .confirmbox{background:#241C16}
+.dark .confirmbox h3{color:#F7EFE3}
+.dark .trempty b{color:#F7EFE3}
+
+/* caption */
+.cap{max-width:1180px;margin:14px auto 0;color:#B9A895;font-size:12.5px;line-height:1.6}
+.cap b{color:#F3EBE0;font-weight:600}
+.cap .k{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:6px}
+
+/* ===== dark mode — warm charcoal (design.md §8) ===== */
+.screen.dark{background:var(--g900);color:#F3EBE0}
+.dark .appbar,.dark .doclist,.dark .edwrap,.dark .palette,.dark .sheet,.dark .card,.dark .chart,.dark .mt .win{background:#241C16}
+.dark .appbar,.dark .panehead,.dark .toolbar,.dark .listtools{border-color:#3A2E24}
+.dark .side{background:var(--g900);border-color:#3A2E24}
+.dark .node{color:#E4D8C9}.dark .node.sel{background:rgba(255,138,0,.16);color:#FFB566}
+.dark .sec{color:#A08A72}
+.dark .card,.dark .chart,.dark .sheet,.dark .palette{border-color:#3A2E24}
+.dark .card:hover{border-color:var(--sunrise)}
+.dark .card h3,.dark .listtools h2,.dark .prev h1,.dark .prev h2,.dark .sheet h3,.dark .sheet .row{color:#F7EFE3}
+.dark .mini,.dark .card .meta,.dark .chip,.dark .crumb,.dark .empty{color:#B9A895}
+.dark .mini,.dark .seg,.dark .chip,.dark .ic,.dark .tk,.dark .search,.dark .split,.dark .banner{border-color:#3A2E24}
+.dark .card .ft,.dark .bar b,.dark .panehead .sync,.dark .colsrc .h,.dark .prev code,.dark .chart .ct .tag{color:var(--sunrise)}
+.dark .chart .ct .tag{background:rgba(255,138,0,.14)}
+.dark .seg button{color:#B9A895}.dark .seg button.on{background:var(--sunrise);color:#3A2000}
+.dark .chip,.dark .ic,.dark .tk,.dark .search{background:#241C16;color:#E4D8C9}
+.dark .tk.on{background:var(--sunrise);color:#3A2000;border-color:var(--sunrise)}
+.dark .gutter{background:#1F1813;border-color:#3A2E24;color:#8A7660}
+.dark .gutter .gh{color:var(--sunrise)}
+.dark textarea.src,.dark .colsrc{color:#F0E6D8}
+.dark .colsrc .md{color:#8A7660}
+.dark .prev p,.dark .prev li{color:#E4D8C9}
+.dark .prev blockquote{background:#1F1813;border-color:#3A2E24;color:#D8C9B4}
+.dark .prev code{background:#1F1813}
+.dark table.spec td{border-color:#3A2E24}
+.dark table.spec tr:nth-child(even) td{background:#1F1813}
+.dark .bars{border-color:#E4D8C9}
+.dark .toolbar{background:#1F1813}
+.dark .palette input{background:#241C16;border-color:#3A2E24;color:#F7EFE3}
+.dark .palette .cmd{color:#E4D8C9}
+.dark .palette .cmd:hover{background:rgba(255,138,0,.12)}
+.dark kbd{border-color:#3A2E24;color:#B9A895}
+.dark .av{border-color:#241C16}
+.dark .empty b{color:#F7EFE3}
+.dark .fake{background:#1F1813}.dark .fake .fbar{background:#241C16;border-color:#3A2E24}
+.dark .fake .furl{background:#1F1813}
+.dark .banner{background:rgba(255,138,0,.12);color:#F3EBE0}
+
+@media (prefers-reduced-motion:reduce){.pulse,.bar-c,.chip.syncing .st{animation:none!important}}
+@media (max-width:760px){.side{width:150px}.hdr{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <svg class="rings" viewBox="0 0 100 100" aria-hidden="true">
+    <g fill="none" stroke="#FF8A00" stroke-width="1">
+      <circle cx="50" cy="50" r="10"/><circle cx="50" cy="50" r="20"/><circle cx="50" cy="50" r="30"/><circle cx="50" cy="50" r="40"/><circle cx="50" cy="50" r="49"/>
+    </g><circle cx="50" cy="50" r="2.6" fill="#FF8A00"/>
+  </svg>
+  <div>
+    <h1>Sol <span class="dot">·</span> The Analyst's Workspace — Mockups v3.1 <span class="dot">Sol Orange</span></h1>
+    <p>v3.1 (04/08/2026): heading font <b>Be Vietnam Pro</b> thay Poppins (ADR-D08 — Poppins thiếu 88/134 glyph tiếng Việt) · thêm <b>S6 Thùng rác</b> + demo 4 trạng thái iCloud (CR-M1, APP-FR-15/17). Palette theo Brand Guideline: #D85A0B · #FF8A00 · #8F3408.</p>
+  </div>
+  <div class="controls" role="tablist" aria-label="Screens">
+    <button class="tab" role="tab" aria-selected="true" data-v="v1">1 · Workspace</button>
+    <button class="tab" role="tab" aria-selected="false" data-v="v2">2 · Editor</button>
+    <button class="tab" role="tab" aria-selected="false" data-v="v3">3 · Data Blocks</button>
+    <button class="tab" role="tab" aria-selected="false" data-v="v4">4 · Collab</button>
+    <button class="tab" role="tab" aria-selected="false" data-v="v5">5 · Split View + Conflict</button>
+    <button class="tab" role="tab" aria-selected="false" data-v="v6">6 · Thùng rác</button>
+    <button class="toggle" id="theme">☾ Dark mode</button>
+  </div>
+</header>
+
+<div class="stage">
+<div class="ipad"><div class="screen" id="screen">
+  <div class="statusbar"><span>09:41</span><span class="r">Sol · iCloud ✓ <span class="batt"></span></span></div>
+
+  <!-- V1 WORKSPACE -->
+  <div class="view on" id="v1">
+    <div class="cols">
+      <aside class="side">
+        <div class="sec">Workspace</div>
+        <button class="node sel">▾ 📁 CRM B2B Logistics</button>
+        <button class="node"><span class="ind"></span>📁 01 · Discovery</button>
+        <button class="node"><span class="ind"></span>📁 02 · Đặc tả</button>
+        <button class="node">▸ 📁 EventOS</button>
+        <button class="node">▸ 📁 BA Bootcamp</button>
+        <div class="sec">Trạng thái</div>
+        <button class="chip" id="syncchip" title="Chạm để đổi trạng thái sync"><span class="st"></span><span id="synctxt">Đã đồng bộ · 2 phút trước</span></button>
+      </aside>
+      <section class="doclist">
+        <div class="appbar" style="border-bottom:none">
+          <span class="logo">S</span><span class="title">CRM B2B Logistics</span>
+          <span class="crumb">/ 02 · Đặc tả</span><span class="spacer"></span>
+          <button class="ic" id="openPalette" title="Command palette">⌘K</button>
+          <button class="btn" id="newDoc">+ Tài liệu mới</button>
+        </div>
+        <div class="listtools">
+          <h2 id="docCount">6 tài liệu</h2>
+          <input class="search" id="q" placeholder="🔍 Tìm trong workspace (FTS)…">
+          <div class="seg"><button class="on" id="gGrid">Lưới</button><button id="gList">Danh sách</button></div>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="empty" id="empty"><b>Không tìm thấy tài liệu</b>Thử từ khóa khác, hoặc tạo tài liệu mới cho "<span id="qecho"></span>".</div>
+        <div class="overlay" id="pal">
+          <div class="palette">
+            <input id="palq" placeholder="Gõ lệnh… (bảng, chart, thùng rác)">
+            <div class="cmd" data-t="Đã chèn bảng 3×3">▦ Chèn bảng <span class="kk">⌘⇧T</span></div>
+            <div class="cmd" data-t="Đã chèn data block">⌗ Chèn sol-data block <span class="kk">⌘⇧D</span></div>
+            <div class="cmd" data-t="Đang xuất snapshot…">⤓ Xuất snapshot <span class="kk"></span></div>
+            <div class="cmd" data-t="Mở Thùng rác" data-go="v6">🗑 Mở Thùng rác <span class="kk"></span></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- V2 EDITOR -->
+  <div class="view" id="v2">
+    <div class="appbar">
+      <span class="logo">S</span><span class="title">FRS-Quy-trinh-Bao-gia.md</span>
+      <span class="chip"><span class="st"></span><span id="dirty">Đã lưu cục bộ</span></span>
+      <span class="spacer"></span>
+      <div class="seg">
+        <button id="mEd">Soạn thảo</button>
+        <button class="on" id="mBoth">Song song</button>
+        <button id="mPv">Preview</button>
+      </div>
+    </div>
+    <div class="edwrap">
+      <div class="pane" id="paneEd">
+        <div class="panehead">Soạn thảo <span class="sync">⇅ scroll-sync</span></div>
+        <div class="edbody">
+          <div class="gutter" id="gutter" aria-hidden="true"></div>
+          <textarea class="src" id="mdsrc" spellcheck="false"></textarea>
+        </div>
+        <div class="toolbar">
+          <button class="tk" data-w="**">B</button><button class="tk" data-w="*"><i>I</i></button>
+          <button class="tk" data-line="## ">H₂</button><button class="tk" data-line="- ">≔</button>
+          <button class="tk" data-line="> ">❝</button><button class="tk" id="insTable">▦ Bảng</button>
+          <span class="hint"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>T</kbd> chèn bảng · gõ để xem gutter đổi</span>
+        </div>
+      </div>
+      <div class="split" id="split1"></div>
+      <div class="pane" id="panePv">
+        <div class="panehead">Live preview <span class="sync" id="lat">render 8ms</span></div>
+        <div class="prev" id="mdout"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V3 DATA BLOCKS -->
+  <div class="view" id="v3">
+    <div class="appbar">
+      <span class="logo">S</span><span class="title">Pipeline-theo-tuan.md</span>
+      <span class="chip"><span class="st"></span>data/pipeline.csv liên kết</span><span class="spacer"></span>
+      <div class="seg">
+        <button class="on" data-c="bar">Bar</button><button data-c="line">Line</button><button data-c="pie">Pie</button>
+      </div>
+    </div>
+    <div class="edwrap">
+      <div class="pane">
+        <div class="panehead">Soạn thảo · sửa số liệu CSV bên dưới</div>
+        <div class="edbody">
+          <textarea class="src" id="csvsrc" spellcheck="false"></textarea>
+        </div>
+        <div class="toolbar"><span class="tk on">⌗ sol-data</span><span class="hint">Đổi số → chart render lại tức thì</span></div>
+      </div>
+      <div class="split"></div>
+      <div class="pane">
+        <div class="panehead">Live preview</div>
+        <div class="prev">
+          <h1>Pipeline báo giá theo tuần</h1>
+          <div class="chart">
+            <div class="ct">Yêu cầu báo giá/tuần <span class="tag" id="ctag">sol-data · bar</span></div>
+            <div id="chartbox"></div>
+          </div>
+          <h2>Nhận định</h2>
+          <p id="insight"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V4 COLLAB -->
+  <div class="view" id="v4">
+    <div class="appbar">
+      <span class="logo">S</span><span class="title">User-Stories-Sprint-4.md</span>
+      <span class="live"><span class="pulse"></span>LIVE</span>
+      <div class="roster"><span class="av me">S</span><span class="av p1">H</span><span class="av p2">P</span></div>
+      <span class="spacer"></span>
+      <span class="chip"><span class="st"></span><span id="latms">Độ trễ 180ms</span></span>
+      <button class="btn" id="playSim">⏸ Tạm dừng mô phỏng</button>
+      <button class="btn" id="invite" style="background:var(--ink)">Mời</button>
+    </div>
+    <div class="edwrap" style="position:relative">
+      <div class="pane">
+        <div class="panehead">Soạn thảo · 3 người đang xem</div>
+        <div class="colsrc" id="colsrc"></div>
+        <div class="toolbar"><span class="hint">CRDT relay · Phú đang gõ bullet mới, Hảo đang chọn văn bản</span></div>
+      </div>
+      <div class="sheet" id="sheet">
+        <h3>Mời vào Live Share</h3>
+        <div class="row">🔗 sol.io/s/8kQ2 <span class="kk">Sao chép</span></div>
+        <div class="row">👤 Hảo — Editor <span class="kk">✓</span></div>
+        <div class="row">👤 Phú — Editor <span class="kk">✓</span></div>
+        <div class="row">👥 Quyền mặc định: Viewer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V5 SPLIT VIEW + CONFLICT -->
+  <div class="view" id="v5">
+    <div class="appbar">
+      <span class="logo">S</span><span class="title">Đa nhiệm iPadOS · APP-FR-02</span><span class="spacer"></span>
+      <div class="seg"><button class="on" data-r="1">50 / 50</button><button data-r="2">33 / 67</button><button data-r="0.5">67 / 33</button></div>
+      <button class="btn" id="fireConflict" style="background:var(--sunrise);color:#3A2000">⚠ Mô phỏng conflict</button>
+    </div>
+    <div class="mt">
+      <div class="win" id="wSol" style="flex:1">
+        <div class="appbar" style="height:38px"><span class="logo">S</span><span class="title" style="font-size:12.5px">FRS-Quy-trinh-Bao-gia.md</span><span class="spacer"></span><span class="chip"><span class="st"></span>iCloud</span></div>
+        <div id="cbanner"></div>
+        <div class="mtdoc">
+          <h2>US-12 · Tạo báo giá từ Opportunity</h2>
+          <p><b>Là</b> nhân viên Sales, <b>tôi muốn</b> tạo báo giá trực tiếp từ Opportunity để không nhập lại dữ liệu.</p>
+          <ul><li>Kế thừa giá theo hợp đồng khung</li><li>Tự tính phụ phí nhiên liệu</li></ul>
+          <h2>Ràng buộc</h2>
+          <p>SLA phản hồi báo giá: <b>4 giờ làm việc</b>.</p>
+        </div>
+      </div>
+      <div class="win" id="wOther" style="flex:1">
+        <div class="fake">
+          <div class="fbar">◀ ▶ <span class="furl">meet.lingble.com/ba-sync-weekly</span></div>
+          <div class="fbody">
+            <div class="vidgrid">
+              <div class="vid">🎥<span class="nm">Hảo</span></div>
+              <div class="vid">🎥<span class="nm">Phú</span></div>
+              <div class="vid">🎥<span class="nm">Sol (bạn)</span></div>
+              <div class="vid">＋<span class="nm">Đang chờ…</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V6 THÙNG RÁC (CR-M1 · APP-FR-17 + demo APP-FR-15) -->
+  <div class="view" id="v6">
+    <div class="appbar">
+      <span class="logo">S</span><span class="title">Thùng rác</span>
+      <span class="chip"><span class="st" style="background:var(--muted)"></span><span id="trcount"></span></span>
+      <span class="spacer"></span>
+      <button class="chip" id="icstate" title="Chạm để xem 4 trạng thái iCloud (APP-FR-15)"><span class="st"></span><span id="icstatetxt">iCloud khả dụng — workspace trên container</span></button>
+    </div>
+    <div id="icbanner"></div>
+    <div class="trlist" id="trlist"></div>
+    <div class="overlay" id="purgeconfirm">
+      <div class="confirmbox">
+        <h3>Xóa vĩnh viễn "<span id="purgename"></span>"?</h3>
+        <p><b>Purge cascade đủ 4 nơi (APP-BR-04):</b> nội dung file · journal · toàn bộ version history · chỉ mục tìm kiếm. Bản sao xung đột liên quan được liệt kê để quyết cùng lúc. <b>Không thể hoàn tác.</b></p>
+        <div class="acts">
+          <button class="btn ghostd" id="purgecancel">Hủy</button>
+          <button class="btn" style="background:var(--danger)" id="purgego">Xóa vĩnh viễn</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div></div>
+
+<div class="cap" id="cap"><span><b><span class="k"></span>Workspace:</b> tìm kiếm lọc thẻ trực tiếp (FTS, empty state dùng dot-grid brand) · Lưới/Danh sách · chip sync 3 trạng thái · ⌘K command palette · "+ Tài liệu mới".</span></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const toast=t=>{const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1800)};
+
+const tabs=[...document.querySelectorAll('.tab')];
+const VIEWS=['v1','v2','v3','v4','v5','v6'];
+const caps={
+ v1:'<span><b><span class="k"></span>Workspace:</b> tìm kiếm lọc thẻ trực tiếp (FTS fold đ/Đ, empty state dot-grid) · Lưới/Danh sách · chip sync 3 trạng thái · ⌘K command palette (danh sách đóng Phụ lục A) · "+ Tài liệu mới".</span>',
+ v2:'<span><b><span class="k"></span>Editor:</b> gõ Markdown thật — preview render tức thì; <b>block gutter (signature)</b> phân loại từng dòng; bảng dùng header Burnt Core #8F3408; 3 chế độ pane, toolbar hoạt động. Heading dùng Be Vietnam Pro (ADR-D08).</span>',
+ v3:'<span><b><span class="k"></span>Data Blocks:</b> sửa CSV → chart re-render với ramp cam (#FF8A00→#D85A0B); Bar/Line/Pie; nhận định per-type (APP-FR-09); lỗi CSV báo đúng dòng.</span>',
+ v4:'<span><b><span class="k"></span>Collab (v1.1):</b> presence palette design.md §2.4 — mô phỏng gõ realtime + share sheet; quyền mặc định Viewer (APP-BR-01).</span>',
+ v5:'<span><b><span class="k"></span>Split View + Conflict:</b> 50/50 · 33/67 · 67/33 (APP-FR-02) · banner Sunrise nêu đúng tên file conflicted copy (ISO yyyy-MM-dd, APP-BR-03) — "mọi phiên bản phát hiện được đều được bảo toàn" (ADR-A03).</span>',
+ v6:'<span><b><span class="k"></span>Thùng rác (S6 mới · CR-M1):</b> khôi phục trong 30 ngày (trùng tên → hậu tố "2", APP-FR-03) · xóa vĩnh viễn qua xác nhận với <b>purge cascade 4 nơi</b> (APP-BR-04) · mục "Bản sao xung đột" riêng có badge (M-01) · chạm chip iCloud để xem <b>4 trạng thái APP-FR-15</b> (khả dụng / chưa đăng nhập / tắt / hết dung lượng) kèm banner fallback + đề nghị di trú.</span>'
+};
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.setAttribute('aria-selected',x===t));
+  VIEWS.forEach(k=>$(k).classList.toggle('on',k===t.dataset.v));
+  $('cap').innerHTML=caps[t.dataset.v];
+}));
+function gotoView(v){const t=tabs.find?null:null;const btn=[...document.querySelectorAll('.tab')].find(x=>x.dataset.v===v);if(btn)btn.click()}
+$('theme').addEventListener('click',()=>{
+  const s=$('screen');s.classList.toggle('dark');
+  $('theme').textContent=s.classList.contains('dark')?'☀ Light mode':'☾ Dark mode';
+});
+
+/* V1 */
+const docs=[
+ {ft:'.MD · FRS',t:'Quy trình Báo giá — Đặc tả chức năng',m:'# FRS · Báo giá\n## US-12 Tạo báo giá\n| ID | Tiêu chí |…',meta:['8,4k từ','<span class="badge">Đang mở</span>']},
+ {ft:'.MD · BRD',t:'BRD v2 — Mục tiêu & phạm vi',m:'# BRD v2\n> Sponsor: Ban GĐ\n- G1: giảm 30% thời gian báo giá…',meta:['5,1k từ','Hôm qua']},
+ {ft:'.MD · DATA',t:'Pipeline theo tuần — Data block',m:'```sol-data type=bar\nweek,count\nW1,120…',meta:['2 chart','Th 5']},
+ {ft:'.MD',t:'User Stories — Sprint 4',m:'## US-14 Duyệt báo giá 2 cấp\n**Là** Sales Manager…',meta:['3,3k từ','Th 4']},
+ {ft:'.MD',t:'Biên bản workshop 28/07',m:'# Workshop ký gửi kho\n- Quyết định: SLA 4h…',meta:['1,9k từ','28/07']},
+ {ft:'.MD',t:'Ma trận RACI dự án',m:'| Vai trò | R | A | C | I |\n| BA | ✓ |…',meta:['640 từ','26/07']}
+];
+function drawDocs(){
+  const q=$('q').value.trim().toLowerCase();
+  const list=docs.filter(d=>d.t.toLowerCase().includes(q)||d.m.toLowerCase().includes(q));
+  $('grid').innerHTML=list.map(d=>`<div class="card"><div><div class="ft">${d.ft}</div><h3>${d.t}</h3><div class="mini">${d.m.replace(/\n/g,'<br>')}</div></div><div class="meta"><span>${d.meta[0]}</span><span>${d.meta[1]}</span></div></div>`).join('');
+  $('docCount').textContent=list.length+' tài liệu';
+  $('empty').style.display=list.length?'none':'block';
+  $('qecho').textContent=$('q').value;
+}
+$('q').addEventListener('input',drawDocs);drawDocs();
+$('gGrid').addEventListener('click',()=>{$('grid').classList.remove('list');$('gGrid').classList.add('on');$('gList').classList.remove('on')});
+$('gList').addEventListener('click',()=>{$('grid').classList.add('list');$('gList').classList.add('on');$('gGrid').classList.remove('on')});
+$('newDoc').addEventListener('click',()=>{docs.unshift({ft:'.MD',t:'Tài liệu chưa đặt tên',m:'# \n(bắt đầu gõ…)',meta:['0 từ','<span class="badge">Mới</span>']});drawDocs();toast('Đã tạo Tai-lieu-chua-dat-ten.md')});
+const syncStates=[['','Đã đồng bộ · vừa xong'],['syncing','Đang đồng bộ 3 thay đổi…'],['off','Ngoại tuyến — sẽ đồng bộ khi có mạng']];let si=0;
+$('syncchip').addEventListener('click',()=>{si=(si+1)%3;$('syncchip').className='chip '+syncStates[si][0];$('synctxt').textContent=syncStates[si][1]});
+$('openPalette').addEventListener('click',()=>{$('pal').classList.add('on');$('palq').focus()});
+$('pal').addEventListener('click',e=>{if(e.target===$('pal'))$('pal').classList.remove('on')});
+document.querySelectorAll('.palette .cmd').forEach(c=>c.addEventListener('click',()=>{$('pal').classList.remove('on');toast(c.dataset.t);if(c.dataset.go)gotoView(c.dataset.go)}));
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('pal').classList.toggle('on');$('palq').focus()}if(e.key==='Escape'){$('pal').classList.remove('on');$('purgeconfirm').classList.remove('on')}});
+
+/* V2 live markdown */
+const initMD=`# FRS · Quy trình Báo giá
+Phiên bản 1.2 · CRM B2B Logistics
+
+## US-12 · Tạo báo giá từ Opportunity
+**Là** nhân viên Sales, **tôi muốn** tạo báo giá trực tiếp từ Opportunity để không nhập lại dữ liệu.
+
+| ID | Tiêu chí nghiệm thu | Ưu tiên |
+|----|--------------------|---------|
+| AC1 | Kế thừa giá theo hợp đồng khung | Must |
+| AC2 | Tự tính phụ phí nhiên liệu | Must |
+
+## Ràng buộc
+> SLA phản hồi báo giá: **4 giờ làm việc**
+- Chiết khấu >10% cần duyệt 2 cấp
+- Log đầy đủ lý do từ chối`;
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const inline=s=>s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/`(.+?)`/g,'<code>$1</code>');
+function classify(l){
+  if(/^# /.test(l))return'H1';if(/^## /.test(l))return'H2';if(/^\s*\|/.test(l))return'TB';
+  if(/^> /.test(l))return'BQ';if(/^- /.test(l))return'UL';if(/^```/.test(l))return'DB';
+  if(l.trim()==='')return'·';return'P';
+}
+function renderMD(src){
+  const lines=src.split('\n');let out=[],ul=false,tb=[];
+  const fUL=()=>{if(ul){out.push('</ul>');ul=false}};
+  const fTB=()=>{if(tb.length){const clean=tb.filter(r=>!/^[\s|:\-]+$/.test(r));
+    let h='<table class="spec">';clean.forEach((r,i)=>{const cs=r.split('|').slice(1,-1).map(c=>inline(esc(c.trim())));h+='<tr>'+cs.map(c=>i===0?`<th>${c}</th>`:`<td>${c}</td>`).join('')+'</tr>'});
+    h+='</table>';out.push(h);tb=[]}};
+  for(const raw of lines){
+    if(/^\s*\|/.test(raw)){fUL();tb.push(raw);continue}
+    fTB();const l=esc(raw);
+    if(/^# /.test(raw)){fUL();out.push('<h1>'+inline(l.slice(2))+'</h1>')}
+    else if(/^## /.test(raw)){fUL();out.push('<h2>'+inline(l.slice(3))+'</h2>')}
+    else if(/^> /.test(raw)){fUL();out.push('<blockquote>'+inline(l.slice(5))+'</blockquote>')}
+    else if(/^- /.test(raw)){if(!ul){out.push('<ul>');ul=true}out.push('<li>'+inline(l.slice(2))+'</li>')}
+    else if(raw.trim()===''){fUL()}
+    else{fUL();out.push('<p>'+inline(l)+'</p>')}
+  }
+  fUL();fTB();return out.join('');
+}
+function refreshEditor(){
+  const t0=performance.now();
+  const v=$('mdsrc').value;
+  $('mdout').innerHTML=renderMD(v);
+  $('gutter').innerHTML=v.split('\n').map(l=>{const c=classify(l);return `<div class="${c!=='P'&&c!=='·'?'gh':''}">${c}</div>`}).join('');
+  $('lat').textContent='render '+Math.max(1,Math.round(performance.now()-t0))+'ms';
+  $('dirty').textContent='Chưa lưu — journal ghi nhận';
+  clearTimeout(window._sv);window._sv=setTimeout(()=>$('dirty').textContent='Đã lưu cục bộ',900);
+}
+$('mdsrc').value=initMD;
+$('mdsrc').addEventListener('input',refreshEditor);
+$('mdsrc').addEventListener('scroll',()=>{$('gutter').scrollTop=$('mdsrc').scrollTop});
+refreshEditor();$('dirty').textContent='Đã lưu cục bộ';
+function mode(m){$('paneEd').classList.toggle('hide',m==='pv');$('panePv').classList.toggle('hide',m==='ed');$('split1').style.display=m==='both'?'':'none';
+ [['mEd','ed'],['mBoth','both'],['mPv','pv']].forEach(([id,k])=>$(id).classList.toggle('on',k===m))}
+$('mEd').onclick=()=>mode('ed');$('mBoth').onclick=()=>mode('both');$('mPv').onclick=()=>mode('pv');
+function wrapSel(w){const ta=$('mdsrc'),s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;
+ ta.value=v.slice(0,s)+w+v.slice(s,e)+w+v.slice(e);ta.focus();ta.selectionStart=s+w.length;ta.selectionEnd=e+w.length;refreshEditor()}
+function linePrefix(p){const ta=$('mdsrc'),v=ta.value,s=ta.selectionStart;const ls=v.lastIndexOf('\n',s-1)+1;
+ ta.value=v.slice(0,ls)+p+v.slice(ls);ta.focus();refreshEditor()}
+document.querySelectorAll('#v2 .tk[data-w]').forEach(b=>b.onclick=()=>wrapSel(b.dataset.w));
+document.querySelectorAll('#v2 .tk[data-line]').forEach(b=>b.onclick=()=>linePrefix(b.dataset.line));
+$('insTable').onclick=()=>{const ta=$('mdsrc');ta.value+='\n\n| Cột A | Cột B | Cột C |\n|---|---|---|\n| … | … | … |';refreshEditor();toast('Đã chèn bảng 3×3')};
+
+/* V3 data block — ramp design.md §2.3 */
+$('csvsrc').value=`\`\`\`sol-data type=bar title="Yêu cầu báo giá/tuần"
+week,count
+W1,120
+W2,180
+W3,146
+W4,215
+\`\`\``;
+let ctype='bar';
+const RAMP=['#D85A0B','#FF8A00','#8F3408','#384152','#6B7280'];
+function parseCSV(){
+  const data=[];
+  $('csvsrc').value.split('\n').forEach(r=>{const m=r.trim().match(/^([^,`]+),(\d+(?:\.\d+)?)$/);if(m&&m[1]!=='week')data.push({k:m[1],v:+m[2]})});
+  return data;
+}
+function drawChart(){
+  const d=parseCSV();const box=$('chartbox');$('ctag').textContent='sol-data · '+ctype;
+  if(!d.length){box.innerHTML='<p style="font-size:11px;color:var(--muted)">Không đọc được CSV — cần dạng <code>W1,120</code></p>';$('insight').textContent='';return}
+  const max=Math.max(...d.map(x=>x.v));
+  if(ctype==='bar'){
+    box.innerHTML='<div class="bars">'+d.map(x=>`<div class="bar"><b>${x.v}</b><i style="height:${Math.round(x.v/max*92)}%"></i></div>`).join('')+'</div><div class="xl">'+d.map(x=>`<span>${x.k}</span>`).join('')+'</div>';
+  }else if(ctype==='line'){
+    const W=300,H=110,pad=14;
+    const pts=d.map((x,i)=>[pad+i*(W-2*pad)/Math.max(1,d.length-1),H-pad-(x.v/max)*(H-2.6*pad)]);
+    box.innerHTML=`<svg class="linec" viewBox="0 0 ${W} ${H}">
+      <line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#2B211B" stroke-width="1.4"/>
+      <polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#D85A0B" stroke-width="2.4" stroke-linejoin="round"/>
+      ${pts.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="3.4" fill="#FF8A00" stroke="#D85A0B" stroke-width="1"/><text x="${p[0]}" y="${p[1]-8}" text-anchor="middle" font-size="8.5" font-family="monospace" fill="#8F3408" font-weight="700">${d[i].v}</text><text x="${p[0]}" y="${H-3}" text-anchor="middle" font-size="8.5" font-family="Inter" fill="#6B7280">${d[i].k}</text>`).join('')}
+    </svg>`;
+  }else{
+    const sum=d.reduce((a,x)=>a+x.v,0);let acc=0;
+    const stops=d.map((x,i)=>{const a0=acc/sum*360;acc+=x.v;const a1=acc/sum*360;return `${RAMP[i%RAMP.length]} ${a0}deg ${a1}deg`}).join(',');
+    box.innerHTML=`<div class="pie"><div class="disc" style="background:conic-gradient(${stops})"></div><div class="legend">`+d.map((x,i)=>`<span><i style="background:${RAMP[i%RAMP.length]}"></i>${x.k} — <b>${x.v}</b> (${Math.round(x.v/sum*100)}%)</span>`).join('')+`</div></div>`;
+  }
+  if(ctype==='pie'){
+    const sum=d.reduce((a,x)=>a+x.v,0);const top=d.reduce((a,x)=>x.v>a.v?x:a,d[0]);
+    $('insight').innerHTML=`${top.k} chiếm tỷ trọng lớn nhất — <b>${Math.round(top.v/sum*100)}%</b>.`;
+  }else if(d.length>=2){const a=d[d.length-2].v,b=d[d.length-1].v;const pc=Math.round((b-a)/a*100);
+    $('insight').innerHTML=`${d[d.length-1].k} ${pc>=0?'tăng':'giảm'} <b>${Math.abs(pc)}%</b> so với ${d[d.length-2].k} — nhận định per-type theo APP-FR-09.`}
+  else{$('insight').textContent=''}
+}
+$('csvsrc').addEventListener('input',drawChart);
+document.querySelectorAll('#v3 .seg [data-c]').forEach(b=>b.onclick=()=>{ctype=b.dataset.c;document.querySelectorAll('#v3 .seg [data-c]').forEach(x=>x.classList.toggle('on',x===b));drawChart()});
+drawChart();
+
+/* V4 collab sim — presence palette §2.4 */
+const typeTarget=' Xuất PDF báo giá đã duyệt gửi khách';
+let ti=0,playing=true;
+function colHTML(typed){
+  return `<span class="md">##</span> <span class="h">US-14 · Duyệt báo giá 2 cấp</span>
+<span class="b">**Là**</span> Sales Manager, <span class="b">**tôi muốn**</span> duyệt các báo giá
+có chiết khấu &gt;10% <span class="cursor c-p1"><span class="name">Hảo</span><span class="bar-c"></span></span><span class="sel-p1">trước khi gửi khách hàng</span>.
+
+<span class="md">-</span> Thông báo đẩy cho cấp duyệt trong 5 phút
+<span class="md">-</span> Ghi log lý do từ chối
+<span class="md">-</span>${esc(typed)}<span class="cursor c-p2"><span class="name">Phú</span><span class="bar-c"></span></span>
+
+<span class="md">##</span> <span class="h">Ngoài phạm vi</span>
+Ủy quyền duyệt khi vắng mặt — chuyển Sprint 5.`;
+}
+function tick(){
+  if(!playing)return;
+  ti=(ti+1)%(typeTarget.length+14);
+  $('colsrc').innerHTML=colHTML(typeTarget.slice(0,Math.min(ti,typeTarget.length)));
+  $('latms').textContent='Độ trễ '+(150+Math.floor(Math.random()*110))+'ms';
+}
+$('colsrc').innerHTML=colHTML('');
+setInterval(tick,140);
+$('playSim').onclick=()=>{playing=!playing;$('playSim').textContent=playing?'⏸ Tạm dừng mô phỏng':'▶ Chạy mô phỏng'};
+$('invite').onclick=()=>$('sheet').classList.toggle('on');
+
+/* V5 split + conflict */
+document.querySelectorAll('#v5 .seg [data-r]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#v5 .seg [data-r]').forEach(x=>x.classList.toggle('on',x===b));
+  $('wSol').style.flex=b.dataset.r;$('wOther').style.flex=1;
+});
+$('fireConflict').onclick=()=>{
+  $('cbanner').innerHTML=`<div class="banner">⚠ <span><b>Xung đột iCloud:</b> iPad của Hảo đã sửa file này khi bạn offline. Bản của bạn được giữ; bản kia lưu thành <b>"FRS-Quy-trinh-Bao-gia (conflicted copy Hảo 2026-08-02).md"</b> — mọi phiên bản phát hiện được đều được bảo toàn.</span><button id="viewCopy">Xem bản sao</button><button class="ghost" id="dismiss">Đóng</button></div>`;
+  $('viewCopy').onclick=()=>toast('Mở bản gốc + bản sao ở 2 cửa sổ (multi-window, M-01)');
+  $('dismiss').onclick=()=>$('cbanner').innerHTML='';
+};
+
+/* V6 THÙNG RÁC — CR-M1 */
+let trItems=[
+ {n:'Biên bản họp cũ 21-07.md', del:'21/07', exp:'còn 17 ngày', copy:false},
+ {n:'Nháp brainstorm EventOS.md', del:'28/07', exp:'còn 24 ngày', copy:false},
+ {n:'Ma trận RACI (bản nháp).md', del:'02/08', exp:'còn 29 ngày', copy:false},
+ {n:'FRS-Quy-trinh-Bao-gia (conflicted copy Hảo 2026-08-02).md', del:'02/08', exp:'còn 29 ngày', copy:true},
+ {n:'FRS-Quy-trinh-Bao-gia (conflicted copy Hảo 2026-08-02) 2.md', del:'03/08', exp:'còn 30 ngày', copy:true},
+];
+let purgeTarget=null;
+function drawTrash(){
+  const normal=trItems.filter(x=>!x.copy), copies=trItems.filter(x=>x.copy);
+  const row=(x,i)=>`<div class="trow">
+     <div class="nm"><b>${x.copy?'<span class="cbadge">BẢN SAO XUNG ĐỘT</span> ':''}${x.n}</b>
+     <span>Xóa ${x.del} · <span class="exp">tự dọn ở lần mở app sau khi đủ 30 ngày (${x.exp})</span></span></div>
+     <button class="btn" data-restore="${i}">Khôi phục</button>
+     <button class="btn ghostd" data-purge="${i}">Xóa vĩnh viễn</button>
+   </div>`;
+  let html='';
+  if(normal.length) html+=`<div class="trsec">Tài liệu đã xóa</div>`+normal.map(x=>row(x,trItems.indexOf(x))).join('');
+  if(copies.length) html+=`<div class="trsec">Bản sao xung đột (nhóm riêng — M-01; dọn chủ động sau khi đã resolve)</div>`+copies.map(x=>row(x,trItems.indexOf(x))).join('');
+  if(!trItems.length) html=`<div class="trempty"><b>Thùng rác trống</b>Tài liệu xóa sẽ nằm ở đây 30 ngày trước khi tự dọn.</div>`;
+  $('trlist').innerHTML=html;
+  $('trcount').textContent=trItems.length?`${trItems.length} mục · khôi phục được trong 30 ngày`:`0 mục`;
+  document.querySelectorAll('#trlist [data-restore]').forEach(b=>b.onclick=()=>{
+    const it=trItems[+b.dataset.restore];
+    trItems=trItems.filter(x=>x!==it);
+    toast(`Đã khôi phục "${it.n.replace('.md','')}"${it.copy?'':' — trùng tên sẽ nhận hậu tố " 2" (APP-FR-03)'}`);
+    drawTrash();
+  });
+  document.querySelectorAll('#trlist [data-purge]').forEach(b=>b.onclick=()=>{
+    purgeTarget=trItems[+b.dataset.purge];
+    $('purgename').textContent=purgeTarget.n;
+    $('purgeconfirm').classList.add('on');
+  });
+}
+$('purgecancel').onclick=()=>{$('purgeconfirm').classList.remove('on');purgeTarget=null};
+$('purgeconfirm').addEventListener('click',e=>{if(e.target===$('purgeconfirm')){$('purgeconfirm').classList.remove('on');purgeTarget=null}});
+$('purgego').onclick=()=>{
+  trItems=trItems.filter(x=>x!==purgeTarget);
+  $('purgeconfirm').classList.remove('on');
+  toast('Đã purge cascade: nội dung + journal + versions + index');
+  purgeTarget=null;drawTrash();
+};
+drawTrash();
+
+/* V6 — demo 4 trạng thái iCloud (APP-FR-15) */
+const icStates=[
+ {dot:'var(--positive)', txt:'iCloud khả dụng — workspace trên container', banner:''},
+ {dot:'#9AA3AE', txt:'Chưa đăng nhập iCloud', banner:'<b>Chưa đăng nhập iCloud</b> — đang dùng workspace cục bộ, đầy đủ tính năng đơn-người-dùng (APP-NFR-04). Bật iCloud để đồng bộ.'},
+ {dot:'#9AA3AE', txt:'iCloud Drive tắt cho Sol', banner:'<b>iCloud Drive đang tắt cho Sol</b> — đang dùng workspace cục bộ. Bật trong Settings hệ thống để đồng bộ.'},
+ {dot:'var(--danger)', txt:'iCloud hết dung lượng', banner:'<b>iCloud hết dung lượng</b> — thay đổi được giữ cục bộ, sẽ đồng bộ khi có chỗ. Khi khả dụng trở lại: đề nghị <b>di trú</b> (không tự động, không ghi đè — trùng tên nhận hậu tố, APP-FR-15).'},
+];
+let ici=0;
+$('icstate').onclick=()=>{
+  ici=(ici+1)%icStates.length;
+  const s=icStates[ici];
+  $('icstate').querySelector('.st').style.background=s.dot;
+  $('icstatetxt').textContent=s.txt;
+  $('icbanner').innerHTML=s.banner?`<div class="banner">☁ <span>${s.banner}</span><button class="ghost" onclick="this.parentElement.remove()">Đóng</button></div>`:'';
+};
+</script>
+</body>
+</html>
