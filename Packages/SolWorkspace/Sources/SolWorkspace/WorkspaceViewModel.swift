@@ -18,17 +18,22 @@ public final class WorkspaceViewModel {
     public var query: String = "" { didSet { refreshList() } }
     public var paletteVisible = false
     public var trashVisible = false
+    public var settingsVisible = false
     public var errorMessage: String?
 
     /// Exposed so the app layer can hand the same store to the editor.
     public let store: DocumentStore
+    /// App-wide preferences (APP-FR-16) — RootView reads theme from here.
+    public let settings: SettingsStore
     private let syncEngine: SyncEngine?
 
     public init(store: DocumentStore, backing: WorkspaceLocation.Backing,
-                syncEngine: SyncEngine? = nil) {
+                syncEngine: SyncEngine? = nil,
+                settings: SettingsStore = SettingsStore()) {
         self.store = store
         self.backing = backing
         self.syncEngine = syncEngine
+        self.settings = settings
         if let engine = syncEngine {
             syncStatus = engine.status
             engine.onStatusChange = { [weak self] status in
@@ -49,7 +54,11 @@ public final class WorkspaceViewModel {
         let dbURL = location.root.appendingPathComponent(".sol-index.sqlite")
         let store = try DocumentStore(root: location.root, index: SearchIndex(databaseURL: dbURL))
         let engine: SyncEngine? = location.backing == .iCloud ? ICloudSyncEngine() : nil
-        return WorkspaceViewModel(store: store, backing: location.backing, syncEngine: engine)
+        let telemetry = try? TelemetryLog(
+            directory: location.root.appendingPathComponent(".sol-telemetry", isDirectory: true))
+        return WorkspaceViewModel(store: store, backing: location.backing,
+                                  syncEngine: engine,
+                                  settings: SettingsStore(telemetry: telemetry))
     }
 
     // MARK: Conflicts (APP-FR-11 — banner + multi-window resolve, M-01)

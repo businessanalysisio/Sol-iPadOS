@@ -55,6 +55,9 @@ private struct RootView: View {
                     }
                     .toolbar(.hidden, for: .navigationBar)
             }
+            // Theme applies at the root → switching in Settings is instant
+            // across every screen, no restart (APP-FR-16 AC).
+            .preferredColorScheme(model.settings.theme.colorScheme)
         case .failure(let error):
             ContentUnavailableView(
                 "Không mở được workspace",

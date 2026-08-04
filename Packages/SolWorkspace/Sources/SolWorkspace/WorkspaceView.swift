@@ -68,6 +68,9 @@ public struct WorkspaceView: View {
         }
         .background(SolColor.bg)
         .sheet(isPresented: $model.trashVisible) { TrashView(model: model) }
+        .sheet(isPresented: $model.settingsVisible) {
+            SettingsView(settings: model.settings) { model.trashVisible = true }
+        }
         .overlay {
             if model.paletteVisible {
                 CommandPaletteView(model: model)
@@ -97,6 +100,10 @@ public struct WorkspaceView: View {
             Button { model.trashVisible = true } label: { Image(systemName: "trash") }
                 .foregroundStyle(SolColor.textSecondary)
                 .accessibilityLabel("Mở Thùng rác")
+            Button { model.settingsVisible = true } label: { Image(systemName: "gearshape") }
+                .foregroundStyle(SolColor.textSecondary)
+                .keyboardShortcut(",", modifiers: .command) // ⌘, — Phụ lục A
+                .accessibilityLabel("Mở Settings")
         }
         .padding(.horizontal, Sol.Spacing.l).padding(.vertical, Sol.Spacing.m)
     }
