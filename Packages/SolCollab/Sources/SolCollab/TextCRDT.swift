@@ -74,23 +74,60 @@ public final class TextCRDT {
 
     // MARK: Remote integration — idempotent, order-tolerant
 
+    /// Ops whose causal dependency has not arrived yet (insert before its
+    /// parent, delete before its target). Without this buffer, a shuffled
+    /// delivery order silently mis-anchors ops and replicas diverge — the
+    /// exact failure the 3-actor fuzz caught on CI.
+    private var pendingOps: [CRDTOp] = []
+
     public func apply(_ op: CRDTOp) {
+        guard integrate(op) else {
+            pendingOps.append(op)
+            return
+        }
+        // Newly-arrived op may unblock buffered ones — drain to fixpoint.
+        var progressed = true
+        while progressed {
+            progressed = false
+            for (i, p) in pendingOps.enumerated() where integrate(p) {
+                pendingOps.remove(at: i)
+                progressed = true
+                break
+            }
+        }
+    }
+
+    /// Returns false when the op must wait for its causal dependency.
+    /// "Seen" sets are only updated on success, so a deferred op is never
+    /// swallowed.
+    private func integrate(_ op: CRDTOp) -> Bool {
         switch op {
         case .insert(let id, let after, let text):
-            guard !seenInserts.contains(id) else { return }
+            guard !seenInserts.contains(id) else { return true }
+            let anchor: Int
+            if let after {
+                guard let found = elements.firstIndex(where: { $0.id == after }) else { return false }
+                anchor = found + 1
+            } else {
+                anchor = 0
+            }
             seenInserts.insert(id)
             counter = max(counter, id.counter) // Lamport advance
-            var idx = after.flatMap { pos in elements.firstIndex { $0.id == pos } }.map { $0 + 1 } ?? 0
             // RGA integration: concurrent siblings settle in descending OpID.
+            // Sound because a greater sibling's whole subtree carries greater
+            // IDs (Lamport: descendants outrank ancestors), so skipping never
+            // crosses into a lesser sibling's territory.
+            var idx = anchor
             while idx < elements.count, elements[idx].id > id { idx += 1 }
             elements.insert(Element(id: id, text: text, deleted: false), at: idx)
+            return true
         case .delete(let target, let by):
-            guard !seenDeletes.contains(by) else { return }
+            guard !seenDeletes.contains(by) else { return true }
+            guard let idx = elements.firstIndex(where: { $0.id == target }) else { return false }
             seenDeletes.insert(by)
             counter = max(counter, by.counter)
-            if let idx = elements.firstIndex(where: { $0.id == target }) {
-                elements[idx].deleted = true
-            }
+            elements[idx].deleted = true
+            return true
         }
     }
 
