@@ -158,9 +158,21 @@ public final class MockRelayHub {
 
 /// One member's connection to the hub.
 public final class MockRelayTransport: CollabTransport {
-    public var onEnvelope: ((Envelope) -> Void)?
+    /// Frames delivered before the session attaches its handler are buffered
+    /// and flushed on set — `join()` sends `welcome` synchronously, before
+    /// CollabSession.init can install onEnvelope (real WS has the same race;
+    /// the production transport must buffer identically — noted for A3).
+    public var onEnvelope: ((Envelope) -> Void)? {
+        didSet {
+            guard let handler = onEnvelope else { return }
+            let backlog = pending
+            pending.removeAll()
+            backlog.forEach(handler)
+        }
+    }
     public let memberID: MemberID
     private weak var hub: MockRelayHub?
+    private var pending: [Envelope] = []
     private(set) var isOpen = true
 
     init(hub: MockRelayHub, memberID: MemberID) {
@@ -183,6 +195,10 @@ public final class MockRelayTransport: CollabTransport {
 
     func deliver(_ env: Envelope) {
         guard isOpen else { return }
-        onEnvelope?(env)
+        if let handler = onEnvelope {
+            handler(env)
+        } else {
+            pending.append(env)
+        }
     }
 }
