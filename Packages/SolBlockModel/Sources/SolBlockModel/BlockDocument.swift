@@ -2,33 +2,34 @@ import Foundation
 
 /// Parsed document state for the editor. Strategy (deliberate, benchmarked):
 ///
-/// BlockParser is a single linear pass with cheap per-line work, so a FULL
-/// reparse of an APP-FR-06-sized document (10k words) costs low single-digit
-/// milliseconds — far inside the 50ms keystroke budget. We therefore reparse
-/// fully on every edit and keep the machinery simple; `PerformanceTests`
-/// asserts the budget on every CI run, and if it ever regresses the
-/// escalation path is true block splicing, adopted deliberately (PRD gate
-/// tuần 3), not silently.
+/// BlockParser is a single UTF-8 pass, so a FULL reparse of an APP-FR-06
+/// tier-1 document (10k words) costs low tens of ms even in Debug. We reparse
+/// fully on every edit and keep the machinery simple; `PerformanceTests` pins
+/// the budget on every CI run, and the escalation path if it ever regresses
+/// is true block splicing — adopted deliberately, never silently.
+///
+/// Hot-path discipline: `text` is the single source of truth and goes to the
+/// parser directly. (An earlier revision split into a lines array and re-joined
+/// per keystroke — three full-document copies that tripled the parse cost;
+/// the tripwire caught it.)
 ///
 /// What IS incremental: `changedLines` — the tag-diff of the last edit — so
-/// the gutter redraws only the lines whose tag actually changed.
+/// the gutter redraws only lines whose tag actually changed.
 public final class BlockDocument {
-    public private(set) var lines: [String]
+    public private(set) var text: String
     public private(set) var result: ParseResult
     public private(set) var changedLines: Range<Int>
 
     public init(text: String) {
-        lines = text.components(separatedBy: "\n")
-        result = BlockParser.parse(lines: lines)
-        changedLines = 0..<lines.count
+        self.text = text
+        result = BlockParser.parse(text)
+        changedLines = 0..<result.lineTypes.count
     }
 
-    public var text: String { lines.joined(separator: "\n") }
-
-    public func replaceAll(with text: String) {
+    public func replaceAll(with newText: String) {
         let oldTypes = result.lineTypes
-        lines = text.components(separatedBy: "\n")
-        result = BlockParser.parse(lines: lines)
+        text = newText
+        result = BlockParser.parse(newText)
         changedLines = Self.diffRange(old: oldTypes, new: result.lineTypes)
     }
 
