@@ -13,6 +13,10 @@ packages:
     path: Packages/SolStore
   SolWorkspace:
     path: Packages/SolWorkspace
+  SolBlockModel:
+    path: Packages/SolBlockModel
+  SolEditor:
+    path: Packages/SolEditor
 
 targets:
   Sol:
@@ -23,6 +27,7 @@ targets:
     dependencies:
       - package: SolDesignSystem
       - package: SolWorkspace
+      - package: SolEditor
     entitlements:
       path: App/Sol.entitlements
       properties:
@@ -51,3 +56,5 @@ schemes:
         - package: SolDesignSystem/SolDesignSystemTests
         - package: SolStore/SolStoreTests
         - package: SolWorkspace/SolWorkspaceTests
+        - package: SolBlockModel/SolBlockModelTests
+        - package: SolEditor/SolEditorTests

@@ -5,9 +5,13 @@ import SolDesignSystem
 /// Màn S1 — Workspace (mockups v3). APP-FR-01/03/04/05.
 public struct WorkspaceView: View {
     @State private var model: WorkspaceViewModel
+    /// App layer composes navigation (plan §2.3: packages stay decoupled) —
+    /// tapping a card hands the Document up instead of pushing a view here.
+    private let onOpen: (Document) -> Void
 
-    public init(model: WorkspaceViewModel) {
+    public init(model: WorkspaceViewModel, onOpen: @escaping (Document) -> Void = { _ in }) {
         _model = State(initialValue: model)
+        self.onOpen = onOpen
     }
 
     public var body: some View {
@@ -80,14 +84,17 @@ public struct WorkspaceView: View {
                     : [GridItem(.flexible())]
                 LazyVGrid(columns: columns, spacing: Sol.Spacing.m) {
                     ForEach(model.documents) { doc in
-                        SolDocumentCard(fileTag: ".MD",
-                                        title: doc.title,
-                                        meta: doc.modifiedAt.formatted(date: .abbreviated, time: .shortened))
-                            .contextMenu {
-                                Button("Xóa (vào Thùng rác)", role: .destructive) {
-                                    model.softDelete(doc)
-                                }
+                        Button { onOpen(doc) } label: {
+                            SolDocumentCard(fileTag: ".MD",
+                                            title: doc.title,
+                                            meta: doc.modifiedAt.formatted(date: .abbreviated, time: .shortened))
+                        }
+                        .buttonStyle(.plain)
+                        .contextMenu {
+                            Button("Xóa (vào Thùng rác)", role: .destructive) {
+                                model.softDelete(doc)
                             }
+                        }
                     }
                 }
                 .padding(Sol.Spacing.l)

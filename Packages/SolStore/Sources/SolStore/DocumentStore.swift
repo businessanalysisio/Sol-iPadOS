@@ -3,7 +3,7 @@ import Foundation
 /// A markdown document in the workspace. Identity = stable UUID kept in a
 /// sidecar (survives rename/move); the file itself stays a plain `.md` any
 /// app can open (APP-FR-10).
-public struct Document: Identifiable, Equatable {
+public struct Document: Identifiable, Equatable, Hashable {
     public let id: String
     public var url: URL
     public var title: String { url.deletingPathExtension().lastPathComponent }
@@ -32,6 +32,8 @@ public final class DocumentStore {
     public static let untitledName = "Tài liệu chưa đặt tên"
 
     public let root: URL
+    public let journal: JournalStore   // APP-FR-12: journal-before-write
+    public let versions: VersionStore  // APP-FR-12: version history + metadata
     private let trashDir: URL
     private let idsDir: URL // sidecar: <uuid> file containing relative path
     private let index: SearchIndex
@@ -48,6 +50,8 @@ public final class DocumentStore {
         self.index = index
         self.fm = fileManager
         self.now = now
+        self.journal = try JournalStore(workspaceRoot: root, fileManager: fileManager)
+        self.versions = try VersionStore(workspaceRoot: root, fileManager: fileManager, now: now)
         for dir in [root, trashDir, idsDir] {
             try fm.createDirectory(at: dir, withIntermediateDirectories: true)
         }
@@ -142,13 +146,35 @@ public final class DocumentStore {
         return Document(id: item.id, url: dest, modifiedAt: now())
     }
 
-    /// Purge cascade — APP-BR-04 / APP-AC-08: content, index entry, sidecar.
-    /// (Journal segments and version history join the cascade in M2/M4.)
+    /// Purge cascade — APP-BR-04 / APP-AC-08: content, index entry, sidecar,
+    /// journal, and every version. After this, nothing of the doc is reachable.
     public func purge(_ item: TrashItem) throws {
         try? fm.removeItem(at: trashDir.appendingPathComponent("\(item.id).md"))
         try? fm.removeItem(at: trashDir.appendingPathComponent("\(item.id).json"))
         try? fm.removeItem(at: sidecarByID(item.id))
         try index.remove(docID: item.id)
+        journal.purgeAll(docID: item.id)
+        versions.purgeAll(docID: item.id)
+    }
+
+    /// "Xuất snapshot" (Phụ lục A / APP-FR-12): named version + a read-only
+    /// copy in Snapshots/ the user can share from Files.app.
+    @discardableResult
+    public func exportSnapshot(of doc: Document, actor: String) throws -> URL {
+        let content = try contents(of: doc)
+        try versions.record(docID: doc.id, content: content, actor: actor, operation: .snapshot)
+        let snapDir = root.appendingPathComponent("Snapshots", isDirectory: true)
+        try fm.createDirectory(at: snapDir, withIntermediateDirectories: true)
+        // Filename-safe stamp (Localization §9: filenames always ISO-ordered,
+        // no "/" or ":"): yyyy-MM-dd-HHmmss.
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.timeZone = TimeZone(identifier: "UTC")
+        f.dateFormat = "yyyy-MM-dd-HHmmss"
+        let name = "\(doc.title)-snapshot-\(f.string(from: now())).md"
+        let dest = FileNaming.collisionFreeURL(for: name, in: snapDir, fileManager: fm)
+        try Data(content.utf8).write(to: dest, options: .atomic)
+        return dest
     }
 
     /// Best-effort: purges everything older than 30 days. Called at store open.

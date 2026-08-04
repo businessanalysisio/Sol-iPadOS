@@ -16,7 +16,8 @@ public final class WorkspaceViewModel {
     public var trashVisible = false
     public var errorMessage: String?
 
-    private let store: DocumentStore
+    /// Exposed so the app layer can hand the same store to the editor.
+    public let store: DocumentStore
 
     public init(store: DocumentStore, backing: WorkspaceLocation.Backing) {
         self.store = store
