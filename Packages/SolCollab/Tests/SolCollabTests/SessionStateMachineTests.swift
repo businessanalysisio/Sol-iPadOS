@@ -68,11 +68,16 @@ final class SessionStateMachineTests: XCTestCase {
     func testRoleChangeEffectiveImmediately() {
         _ = makeOwnerSession()
         let guest = joinGuest("Hảo")
-        XCTAssertEqual(guest.insert("k", at: 0), .failure(.viewerCannotEdit))
+        guard case .failure(let error) = guest.insert("k", at: 0) else {
+            return XCTFail("viewer phải bị chặn sửa")
+        }
+        XCTAssertEqual(error, .viewerCannotEdit)
 
         hub.setRole("m1", to: .editor)
         XCTAssertEqual(guest.role, .editor) // role_changed frame landed
-        XCTAssertEqual(guest.insert("k", at: 0), .success(()))
+        if case .failure = guest.insert("k", at: 0) {
+            XCTFail("editor phải sửa được sau khi đổi quyền")
+        }
     }
 
     // MARK: Owner mất mạng → SUSPENDED; quay lại ≤15' → resume + replay held ops
@@ -121,7 +126,10 @@ final class SessionStateMachineTests: XCTestCase {
         XCTAssertEqual(hao.state, .ended)
         XCTAssertEqual(hao.endReason, .timeout)
         XCTAssertEqual(hao.endSnapshot, "ab", "snapshot phải chứa cả thao tác tạm giữ (G2)")
-        XCTAssertEqual(hao.insert("x", at: 0), .failure(.sessionEnded)) // read-only sau END
+        guard case .failure(let error) = hao.insert("x", at: 0) else {
+            return XCTFail("sau END phải read-only")
+        }
+        XCTAssertEqual(error, .sessionEnded)
     }
 
     // MARK: Revoke link ≠ end session (APP-FR-14 / PAUL-09)
