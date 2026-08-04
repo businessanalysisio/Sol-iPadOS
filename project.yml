@@ -17,6 +17,8 @@ packages:
     path: Packages/SolBlockModel
   SolEditor:
     path: Packages/SolEditor
+  SolDataBlocks:
+    path: Packages/SolDataBlocks
 
 targets:
   Sol:
@@ -58,3 +60,4 @@ schemes:
         - package: SolWorkspace/SolWorkspaceTests
         - package: SolBlockModel/SolBlockModelTests
         - package: SolEditor/SolEditorTests
+        - package: SolDataBlocks/SolDataBlocksTests

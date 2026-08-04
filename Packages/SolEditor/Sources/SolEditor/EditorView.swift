@@ -34,7 +34,8 @@ public struct EditorView: View {
                     }
                 }
                 if model.paneMode != .editor {
-                    PreviewView(blocks: model.blockDoc.result.blocks)
+                    PreviewView(blocks: model.blockDoc.result.blocks,
+                                resolveCSV: { model.resolveCSV($0) })
                 }
             }
 

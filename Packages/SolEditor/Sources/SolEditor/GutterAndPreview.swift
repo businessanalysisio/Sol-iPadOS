@@ -1,5 +1,6 @@
 import SwiftUI
 import SolBlockModel
+import SolDataBlocks
 import SolDesignSystem
 
 /// Block gutter — APP-FR-07 (signature, "product truth"). Renders one tag per
@@ -38,6 +39,8 @@ struct GutterView: View {
 /// one parser, one truth).
 struct PreviewView: View {
     let blocks: [Block]
+    /// Resolves `src=…` of sol-data blocks to CSV text (workspace-relative).
+    var resolveCSV: ((String) -> String?)? = nil
 
     var body: some View {
         ScrollView {
@@ -106,16 +109,21 @@ struct PreviewView: View {
             }
             .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(SolColor.border))
         case .fence(let info, let body):
-            VStack(alignment: .leading, spacing: Sol.Spacing.xs) {
-                Text(info.isEmpty ? "code" : info)
-                    .font(SolFont.data()).foregroundStyle(SolColor.accentStrong)
-                ForEach(Array(body.enumerated()), id: \.offset) { _, line in
-                    Text(line).font(SolFont.mono()).foregroundStyle(SolColor.textPrimary)
+            if DataBlockParser.isSolData(info: info) {
+                // M3 (APP-FR-09): sol-data fences render as live charts.
+                DataBlockView(info: info, body: body, resolveCSV: resolveCSV)
+            } else {
+                VStack(alignment: .leading, spacing: Sol.Spacing.xs) {
+                    Text(info.isEmpty ? "code" : info)
+                        .font(SolFont.data()).foregroundStyle(SolColor.accentStrong)
+                    ForEach(Array(body.enumerated()), id: \.offset) { _, line in
+                        Text(line).font(SolFont.mono()).foregroundStyle(SolColor.textPrimary)
+                    }
                 }
+                .padding(Sol.Spacing.m)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(SolColor.bg, in: RoundedRectangle(cornerRadius: 8))
             }
-            .padding(Sol.Spacing.m)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(SolColor.bg, in: RoundedRectangle(cornerRadius: 8))
         }
     }
 

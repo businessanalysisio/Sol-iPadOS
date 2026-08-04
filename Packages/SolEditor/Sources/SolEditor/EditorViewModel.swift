@@ -106,6 +106,14 @@ public final class EditorViewModel {
         catch { errorMessage = "Không xuất được snapshot: \(error.localizedDescription)" }
     }
 
+    /// Resolves a sol-data `src=` path relative to the workspace root
+    /// (APP-FR-09: "liên kết file data/*.csv"). Rejects escapes above root.
+    public func resolveCSV(_ path: String) -> String? {
+        let target = store.root.appendingPathComponent(path).standardizedFileURL
+        guard target.path.hasPrefix(store.root.standardizedFileURL.path) else { return nil }
+        return try? String(contentsOf: target, encoding: .utf8)
+    }
+
     // MARK: Debounced pipeline
 
     private func scheduleJournal() {

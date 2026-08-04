@@ -14,10 +14,11 @@ let package = Package(
         .package(path: "../SolBlockModel"),
         .package(path: "../SolStore"),
         .package(path: "../SolDesignSystem"),
+        .package(path: "../SolDataBlocks"),
     ],
     targets: [
         .target(name: "SolEditor",
-                dependencies: ["SolBlockModel", "SolStore", "SolDesignSystem"]),
+                dependencies: ["SolBlockModel", "SolStore", "SolDesignSystem", "SolDataBlocks"]),
         .testTarget(name: "SolEditorTests", dependencies: ["SolEditor"]),
     ]
 )
