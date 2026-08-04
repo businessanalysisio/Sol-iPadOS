@@ -19,6 +19,8 @@ packages:
     path: Packages/SolEditor
   SolDataBlocks:
     path: Packages/SolDataBlocks
+  SolCollab:
+    path: Packages/SolCollab # v1.1 — KHÔNG là dependency của app target v1 (HR-2)
 
 targets:
   Sol:
@@ -61,3 +63,4 @@ schemes:
         - package: SolBlockModel/SolBlockModelTests
         - package: SolEditor/SolEditorTests
         - package: SolDataBlocks/SolDataBlocksTests
+        - package: SolCollab/SolCollabTests
