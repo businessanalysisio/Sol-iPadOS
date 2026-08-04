@@ -28,9 +28,9 @@ public final class MockRelayHub {
     // MARK: Lifecycle (SPEC-RELAY §4.1)
 
     /// Join via share link — default role is ALWAYS viewer (APP-BR-01).
-    public func join(displayName: String) -> Result<MockRelayTransport, String> {
-        guard state != .ended else { return .failure(RelayErrorCode.gone) }
-        guard !linkRevoked else { return .failure(RelayErrorCode.linkRevoked) }
+    public func join(displayName: String) -> Result<MockRelayTransport, RelayJoinError> {
+        guard state != .ended else { return .failure(.gone) }
+        guard !linkRevoked else { return .failure(.linkRevoked) }
         let id = "m\(members.count)"
         let member = Member(id: id, displayName: displayName, role: .viewer)
         members[id] = member

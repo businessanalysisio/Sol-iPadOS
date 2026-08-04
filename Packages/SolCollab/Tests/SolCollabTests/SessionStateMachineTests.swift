@@ -164,10 +164,10 @@ final class SessionStateMachineTests: XCTestCase {
     func testJoinAfterEndReturnsGone() {
         _ = makeOwnerSession()
         hub.endSession()
-        guard case .failure(let code) = hub.join(displayName: "Trễ") else {
+        guard case .failure(let error) = hub.join(displayName: "Trễ") else {
             return XCTFail("join sau END phải fail")
         }
-        XCTAssertEqual(code, RelayErrorCode.gone)
+        XCTAssertEqual(error, .gone)
     }
 
     // MARK: Guest mới nhận snapshot qua relay (snapshot_req flow)

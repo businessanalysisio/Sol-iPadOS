@@ -73,6 +73,12 @@ public enum RelayErrorCode {
     public static let linkRevoked = "LINK_REVOKED"     // join after revoke (new joins only)
 }
 
+/// Typed join failures (REST layer, SPEC-RELAY §4.1).
+public enum RelayJoinError: Error, Equatable {
+    case gone        // 410 — "Phiên đã kết thúc"
+    case linkRevoked // link vô hiệu, phiên vẫn chạy cho người bên trong
+}
+
 /// Client-side transport abstraction — mock in tests/Layer 1, Cloudflare DO
 /// in v1.1 production. Deliberately tiny: connect, send, receive, close.
 public protocol CollabTransport: AnyObject {
