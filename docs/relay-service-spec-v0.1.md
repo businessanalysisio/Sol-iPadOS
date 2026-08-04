@@ -1,8 +1,8 @@
 # Spec kỹ thuật — Sol Live Share Relay Service
 
-**Mã tài liệu:** SPEC-RELAY · **Phiên bản:** v0.1 (draft cho quyết định HR-5) · **Ngày:** 04/08/2026
+**Mã tài liệu:** SPEC-RELAY · **Phiên bản:** v1.0 — ✅ **HR-5 ĐÃ CHỐT 04/08/2026 (PO phê duyệt theo đề xuất)** · trước hạn tuần 8
 **Phục vụ:** PRD-APP-IPAD v1.2 — APP-FR-13/14 (phát hành v1.1), APP-BR-01/06, APP-AC-06, ADR-A02 rev.2
-**Deadline quyết định HR-5:** tuần 8 (dời từ tuần 10 theo re-review PAUL-05) · **Người quyết:** PO + tech lead
+**Quyết định:** Cloudflare Workers + Durable Objects · A3 part-time tuần 8–10 · capability link + HMAC token. Các mục §10 chốt theo đề xuất (chi tiết cuối tài liệu); tiểu mục duy nhất còn treo: domain share link (không chặn build — staging dùng `*.workers.dev`).
 
 ---
 
@@ -142,13 +142,13 @@ iPad C (viewer) ─WSS──┘         │                                  ├
 
 App-side (đã có sẵn từ M4/M5 design): relay mock theo giao thức này cho test Lớp 1; Lớp 2 chạy trên staging.
 
-## 10. Câu hỏi mở / cần PO chốt cùng HR-5
+## 10. Câu hỏi mở — KẾT QUẢ CHỐT (PO, 04/08/2026)
 
-1. **Region SIN chấp nhận được cho beta VN?** (độ trễ VN↔SIN ~30–50ms RTT — vẫn trong ngân sách; vấn đề là tuyên bố dữ liệu, không phải kỹ thuật)
-2. Domain `sol.io/s/<id>` — ai giữ DNS `sol.io`, hay dùng `share.sol.io.vn`?
-3. E2E encryption: chấp nhận hoãn đến khi có identity (GĐ3) như §6, hay nâng ưu tiên?
-4. Giới hạn 8 member/phiên và TTL token 24h — xác nhận hay chỉnh?
-5. Ngân sách Cloudflare Workers Paid ($5/tháng) — phê duyệt.
+1. **Region SIN cho beta:** ✅ chấp nhận. Tuyên bố minh bạch trong share sheet (gộp vào cảnh báo APP-BR-06: "…qua máy chủ relay đặt tại Singapore"). Xem lại khi có yêu cầu chủ quyền dữ liệu (GĐ3+, đường lùi self-host §8B).
+2. **Domain share link:** ⏳ còn treo — duy nhất mục chưa chốt (PO/ops xác nhận quyền DNS `sol.io` vs dùng `share.sol.io.vn`). **Không chặn build**: tuần 8–10 dùng `*.workers.dev` staging; hằng số URL cấu hình một chỗ ở cả relay lẫn app.
+3. **E2E encryption:** ✅ hoãn đến khi có identity system (GĐ3) đúng §6; APP-BR-06 giữ nguyên cảnh báo.
+4. **8 member/phiên · TTL token 24h:** ✅ xác nhận.
+5. **Ngân sách Cloudflare Workers Paid $5/tháng:** ✅ phê duyệt.
 
 ## 11. Truy vết
 
