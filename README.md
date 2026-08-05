@@ -2,7 +2,7 @@
 
 Client native iPadOS của nền tảng SOL (Second Brain & Knowledge Infrastructure, sol.io.vn).
 
-**Hồ sơ quản trị:** PRD baseline **v1.2.1** (`E:\Documents\PRD-Sol-iPadOS-App-v1.1.md` — giữ tên file cũ) · Kế hoạch (`SOL-iPadOS-App-Development-Plan-v1.0.md`) · Biên bản KG-BA Council + re-review. **Tài liệu canonical trong repo:** [`docs/design.md`](docs/design.md) (ADR-D07/D08) · [`docs/sol_ipados_mockups_v3.1_orange.html`](docs/sol_ipados_mockups_v3.1_orange.html) · [`docs/relay-service-spec-v0.1.md`](docs/relay-service-spec-v0.1.md) (v1.0, HR-5 đã duyệt).
+**Hồ sơ quản trị:** PRD baseline **v1.2.1** (`E:\Documents\PRD-Sol-iPadOS-App-v1.1.md` — giữ tên file cũ) · Kế hoạch (`SOL-iPadOS-App-Development-Plan-v1.0.md`) · Biên bản KG-BA Council + re-review. **Tài liệu canonical trong repo:** [`docs/design.md`](docs/design.md) (ADR-D07/D08) · [`docs/sol_ipados_mockups_v3.2_orange.html`](docs/sol_ipados_mockups_v3.2_orange.html) (mockup tương tác — đủ 7 màn hình, gồm S7 Settings) · [`docs/relay-service-spec-v0.1.md`](docs/relay-service-spec-v0.1.md) (v1.0, HR-5 đã duyệt).
 
 ## Trạng thái milestone (04/08/2026)
 
@@ -34,7 +34,7 @@ Sol-iPadOS/
 │   ├── SolDataBlocks/         # màn S3: sol-data → Swift Charts + insight + VoiceOver
 │   ├── SolWorkspace/          # màn S1 + Thùng rác + ⌘K palette + Settings
 │   └── SolCollab/             # màn S4 (v1.1): CRDT + relay mock + roster/share sheet — NGOÀI app v1
-├── docs/                      # design.md, mockups v3.1, relay spec (canonical)
+├── docs/                      # design.md, mockups v3.2 (tương tác, 7 màn), relay spec (canonical)
 └── .github/workflows/ci.yml   # macos-15, tự provision simulator iPad gen 10 (HR-4)
 ```
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sol – The Analyst's Workspace · iPadOS Mockups v3.1 (Sol Orange · Be Vietnam Pro)</title>
+<title>Sol – The Analyst's Workspace · iPadOS Mockups v3.2 (Sol Orange · Be Vietnam Pro)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -208,6 +208,32 @@ svg.linec{width:100%;height:120px;display:block}
 .dark .confirmbox h3{color:#F7EFE3}
 .dark .trempty b{color:#F7EFE3}
 
+/* ===== S7 Settings (APP-FR-16) ===== */
+.setwrap{flex:1;overflow:auto;padding:18px 22px;background:var(--bg)}
+.setform{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.setsec .sec{margin:0 6px 6px}
+.setcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.setrow{display:flex;align-items:center;gap:10px;padding:10px 14px;font:400 12px 'Inter',sans-serif;color:var(--ink);border-top:1px solid var(--line);width:100%}
+.setrow:first-child{border-top:none}
+.setrow .lab{flex:1;text-align:left}
+.setrow .kk{font:600 10px var(--mono);color:var(--muted)}
+button.setrow{background:none;border-left:none;border-right:none;border-bottom:none;cursor:pointer}
+button.setrow:hover{background:rgba(216,90,11,.07)}
+.setrow.destr{color:var(--danger);font-weight:600}
+.setnote{display:none;font:600 11px 'Inter',sans-serif;color:var(--burnt)}
+.setnote.on{display:flex}
+.setfoot{font-size:10px;color:var(--muted);line-height:1.65;padding:8px 6px 0}
+.sw{width:38px;height:22px;border-radius:999px;background:#C9CDD3;position:relative;cursor:pointer;border:none;transition:.18s;flex:none}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.18s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sw.on{background:var(--accent)}
+.sw.on::after{left:18px}
+.dark .setcard{background:#241C16;border-color:#3A2E24}
+.dark .setrow{color:#E4D8C9;border-color:#3A2E24}
+.dark button.setrow:hover{background:rgba(255,138,0,.09)}
+.dark .setnote{color:var(--sunrise)}
+.dark .setfoot{color:#B9A895}
+.dark .sw.on{background:var(--sunrise)}
+
 /* caption */
 .cap{max-width:1180px;margin:14px auto 0;color:#B9A895;font-size:12.5px;line-height:1.6}
 .cap b{color:#F3EBE0;font-weight:600}
@@ -264,8 +290,8 @@ svg.linec{width:100%;height:120px;display:block}
     </g><circle cx="50" cy="50" r="2.6" fill="#FF8A00"/>
   </svg>
   <div>
-    <h1>Sol <span class="dot">·</span> The Analyst's Workspace — Mockups v3.1 <span class="dot">Sol Orange</span></h1>
-    <p>v3.1 (04/08/2026): heading font <b>Be Vietnam Pro</b> thay Poppins (ADR-D08 — Poppins thiếu 88/134 glyph tiếng Việt) · thêm <b>S6 Thùng rác</b> + demo 4 trạng thái iCloud (CR-M1, APP-FR-15/17). Palette theo Brand Guideline: #D85A0B · #FF8A00 · #8F3408.</p>
+    <h1>Sol <span class="dot">·</span> The Analyst's Workspace — Mockups v3.2 <span class="dot">Sol Orange</span></h1>
+    <p>v3.2 (05/08/2026): thêm <b>S7 Settings</b> (APP-FR-16 — theme instant, ngôn ngữ + restart notice, phím tắt từ danh sách đóng, telemetry 2 lớp APP-NFR-08) · ⌘K palette đủ 8 lệnh Phụ lục A + lọc khi gõ. Đủ 7 màn hình của app. Palette theo Brand Guideline: #D85A0B · #FF8A00 · #8F3408.</p>
   </div>
   <div class="controls" role="tablist" aria-label="Screens">
     <button class="tab" role="tab" aria-selected="true" data-v="v1">1 · Workspace</button>
@@ -274,6 +300,7 @@ svg.linec{width:100%;height:120px;display:block}
     <button class="tab" role="tab" aria-selected="false" data-v="v4">4 · Collab</button>
     <button class="tab" role="tab" aria-selected="false" data-v="v5">5 · Split View + Conflict</button>
     <button class="tab" role="tab" aria-selected="false" data-v="v6">6 · Thùng rác</button>
+    <button class="tab" role="tab" aria-selected="false" data-v="v7">7 · Settings</button>
     <button class="toggle" id="theme">☾ Dark mode</button>
   </div>
 </header>
@@ -311,10 +338,14 @@ svg.linec{width:100%;height:120px;display:block}
         <div class="empty" id="empty"><b>Không tìm thấy tài liệu</b>Thử từ khóa khác, hoặc tạo tài liệu mới cho "<span id="qecho"></span>".</div>
         <div class="overlay" id="pal">
           <div class="palette">
-            <input id="palq" placeholder="Gõ lệnh… (bảng, chart, thùng rác)">
-            <div class="cmd" data-t="Đã chèn bảng 3×3">▦ Chèn bảng <span class="kk">⌘⇧T</span></div>
-            <div class="cmd" data-t="Đã chèn data block">⌗ Chèn sol-data block <span class="kk">⌘⇧D</span></div>
+            <input id="palq" placeholder="Gõ lệnh… (danh sách đóng Phụ lục A)">
+            <div class="cmd" data-t="Đã chèn bảng 3×3" data-go="v2">▦ Chèn bảng <span class="kk">⌘⇧T</span></div>
+            <div class="cmd" data-t="Đã chèn data block" data-go="v3">⌗ Chèn sol-data block <span class="kk">⌘⇧D</span></div>
             <div class="cmd" data-t="Đang xuất snapshot…">⤓ Xuất snapshot <span class="kk"></span></div>
+            <div class="cmd" data-t="Đã tạo tài liệu mới" data-new="1">＋ Tài liệu mới <span class="kk">⌘N</span></div>
+            <div class="cmd" data-t="Chuyển chế độ pane" data-go="v2">⫿ Chuyển chế độ pane <span class="kk">⌘1/2/3</span></div>
+            <div class="cmd" data-t="Tìm trong tài liệu" data-go="v2">🔍 Tìm trong tài liệu <span class="kk">⌘F</span></div>
+            <div class="cmd" data-t="Tìm trong workspace (FTS fold đ/Đ)">🔎 Tìm trong workspace <span class="kk">⌘⇧F</span></div>
             <div class="cmd" data-t="Mở Thùng rác" data-go="v6">🗑 Mở Thùng rác <span class="kk"></span></div>
           </div>
         </div>
@@ -473,6 +504,65 @@ svg.linec{width:100%;height:120px;display:block}
     </div>
   </div>
 
+  <!-- V7 SETTINGS (APP-FR-16) -->
+  <div class="view" id="v7">
+    <div class="appbar">
+      <span class="logo">S</span><span class="title">Settings</span>
+      <span class="crumb">APP-FR-16 · ⌘,</span><span class="spacer"></span>
+      <button class="btn" style="background:var(--ink)" id="setClose">Đóng</button>
+    </div>
+    <div class="setwrap">
+      <div class="setform">
+        <div class="setsec"><div class="sec">Giao diện</div>
+          <div class="setcard">
+            <div class="setrow"><span class="lab">Theme</span>
+              <div class="seg" id="thSeg">
+                <button data-th="system">Theo hệ thống</button>
+                <button data-th="light">Sáng</button>
+                <button data-th="dark">Tối</button>
+              </div>
+            </div>
+          </div>
+          <div class="setfoot">Hiệu lực NGAY, không restart (AC APP-FR-16) — đổi thử và xem toàn bộ mockup chuyển theme.</div>
+        </div>
+        <div class="setsec"><div class="sec">Ngôn ngữ</div>
+          <div class="setcard">
+            <div class="setrow"><span class="lab">Ngôn ngữ giao diện</span>
+              <div class="seg" id="langSeg">
+                <button class="on" data-lg="vi">Tiếng Việt</button>
+                <button data-lg="en">English</button>
+              </div>
+            </div>
+            <div class="setrow setnote" id="langnote">⟲ Ngôn ngữ mới áp dụng sau khi khởi động lại Sol.</div>
+          </div>
+          <div class="setfoot">Được phép cần restart — nhưng PHẢI thông báo (AC APP-FR-16).</div>
+        </div>
+        <div class="setsec"><div class="sec">Phím tắt (Phụ lục A — danh sách đóng)</div>
+          <div class="setcard" id="shortcuts"></div>
+        </div>
+        <div class="setsec"><div class="sec">Dữ liệu</div>
+          <div class="setcard">
+            <button class="setrow" id="setTrash"><span class="lab">🗑 Mở Thùng rác (khôi phục trong 30 ngày)</span><span class="kk">›</span></button>
+          </div>
+        </div>
+        <div class="setsec"><div class="sec">Telemetry</div>
+          <div class="setcard">
+            <div class="setrow"><span class="lab">Gửi dữ liệu vận hành (Lớp 1)</span><button class="sw on" id="swTele" role="switch" aria-checked="true" aria-label="Gửi dữ liệu vận hành"></button></div>
+            <button class="setrow destr" id="teleErase"><span class="lab">Xóa toàn bộ log telemetry trên máy</span></button>
+          </div>
+          <div class="setfoot" id="telefoot"></div>
+        </div>
+        <div class="setsec"><div class="sec">Giới thiệu</div>
+          <div class="setcard">
+            <div class="setrow"><span class="lab">Phiên bản</span><span class="kk">0.1.0 (1)</span></div>
+            <div class="setrow"><span class="lab">Font chữ</span><span class="kk">Be Vietnam Pro · Inter — giấy phép OFL</span></div>
+            <div class="setrow"><span class="lab">Thiết kế</span><span class="kk">Sol Design System (ADR-D07/D08)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 </div></div>
 
@@ -484,13 +574,14 @@ const $=id=>document.getElementById(id);
 const toast=t=>{const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1800)};
 
 const tabs=[...document.querySelectorAll('.tab')];
-const VIEWS=['v1','v2','v3','v4','v5','v6'];
+const VIEWS=['v1','v2','v3','v4','v5','v6','v7'];
 const caps={
  v1:'<span><b><span class="k"></span>Workspace:</b> tìm kiếm lọc thẻ trực tiếp (FTS fold đ/Đ, empty state dot-grid) · Lưới/Danh sách · chip sync 3 trạng thái · ⌘K command palette (danh sách đóng Phụ lục A) · "+ Tài liệu mới".</span>',
  v2:'<span><b><span class="k"></span>Editor:</b> gõ Markdown thật — preview render tức thì; <b>block gutter (signature)</b> phân loại từng dòng; bảng dùng header Burnt Core #8F3408; 3 chế độ pane, toolbar hoạt động. Heading dùng Be Vietnam Pro (ADR-D08).</span>',
  v3:'<span><b><span class="k"></span>Data Blocks:</b> sửa CSV → chart re-render với ramp cam (#FF8A00→#D85A0B); Bar/Line/Pie; nhận định per-type (APP-FR-09); lỗi CSV báo đúng dòng.</span>',
  v4:'<span><b><span class="k"></span>Collab (v1.1):</b> presence palette design.md §2.4 — mô phỏng gõ realtime + share sheet; quyền mặc định Viewer (APP-BR-01).</span>',
  v5:'<span><b><span class="k"></span>Split View + Conflict:</b> 50/50 · 33/67 · 67/33 (APP-FR-02) · banner Sunrise nêu đúng tên file conflicted copy (ISO yyyy-MM-dd, APP-BR-03) — "mọi phiên bản phát hiện được đều được bảo toàn" (ADR-A03).</span>',
+ v7:'<span><b><span class="k"></span>Settings (S7 · APP-FR-16):</b> theme hiệu lực <b>tức thì</b> (không restart) — đổi thử để xem toàn mockup chuyển theme · ngôn ngữ được phép cần restart nhưng PHẢI báo · phím tắt render từ chính <b>danh sách đóng Phụ lục A</b> (SolCommandID + NonPaletteShortcuts) · telemetry 2 lớp: Lớp 1 toggle được, Lớp 2 không tồn tại field chở nội dung (APP-NFR-08) · purge log tại chỗ.</span>',
  v6:'<span><b><span class="k"></span>Thùng rác (S6 mới · CR-M1):</b> khôi phục trong 30 ngày (trùng tên → hậu tố "2", APP-FR-03) · xóa vĩnh viễn qua xác nhận với <b>purge cascade 4 nơi</b> (APP-BR-04) · mục "Bản sao xung đột" riêng có badge (M-01) · chạm chip iCloud để xem <b>4 trạng thái APP-FR-15</b> (khả dụng / chưa đăng nhập / tắt / hết dung lượng) kèm banner fallback + đề nghị di trú.</span>'
 };
 tabs.forEach(t=>t.addEventListener('click',()=>{
@@ -498,11 +589,17 @@ tabs.forEach(t=>t.addEventListener('click',()=>{
   VIEWS.forEach(k=>$(k).classList.toggle('on',k===t.dataset.v));
   $('cap').innerHTML=caps[t.dataset.v];
 }));
-function gotoView(v){const t=tabs.find?null:null;const btn=[...document.querySelectorAll('.tab')].find(x=>x.dataset.v===v);if(btn)btn.click()}
-$('theme').addEventListener('click',()=>{
-  const s=$('screen');s.classList.toggle('dark');
-  $('theme').textContent=s.classList.contains('dark')?'☀ Light mode':'☾ Dark mode';
-});
+function gotoView(v){const btn=tabs.find(x=>x.dataset.v===v);if(btn)btn.click()}
+/* theme — single source of truth, shared by header toggle + Settings picker (APP-FR-16: instant) */
+let themePref='light';
+function applyTheme(){
+  const dark=themePref==='dark'||(themePref==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);
+  $('screen').classList.toggle('dark',dark);
+  $('theme').textContent=dark?'☀ Light mode':'☾ Dark mode';
+  document.querySelectorAll('#thSeg button').forEach(b=>b.classList.toggle('on',b.dataset.th===themePref));
+}
+$('theme').addEventListener('click',()=>{themePref=$('screen').classList.contains('dark')?'light':'dark';applyTheme()});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(themePref==='system')applyTheme()});
 
 /* V1 */
 const docs=[
@@ -529,8 +626,13 @@ const syncStates=[['','Đã đồng bộ · vừa xong'],['syncing','Đang đồ
 $('syncchip').addEventListener('click',()=>{si=(si+1)%3;$('syncchip').className='chip '+syncStates[si][0];$('synctxt').textContent=syncStates[si][1]});
 $('openPalette').addEventListener('click',()=>{$('pal').classList.add('on');$('palq').focus()});
 $('pal').addEventListener('click',e=>{if(e.target===$('pal'))$('pal').classList.remove('on')});
-document.querySelectorAll('.palette .cmd').forEach(c=>c.addEventListener('click',()=>{$('pal').classList.remove('on');toast(c.dataset.t);if(c.dataset.go)gotoView(c.dataset.go)}));
-document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('pal').classList.toggle('on');$('palq').focus()}if(e.key==='Escape'){$('pal').classList.remove('on');$('purgeconfirm').classList.remove('on')}});
+document.querySelectorAll('.palette .cmd').forEach(c=>c.addEventListener('click',()=>{$('pal').classList.remove('on');toast(c.dataset.t);if(c.dataset.new)$('newDoc').click();if(c.dataset.go)gotoView(c.dataset.go)}));
+$('palq').addEventListener('input',()=>{const q=$('palq').value.trim().toLowerCase();
+  document.querySelectorAll('.palette .cmd').forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(q)?'':'none'})});
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('pal').classList.toggle('on');$('palq').focus()}
+  if((e.metaKey||e.ctrlKey)&&e.key===','){e.preventDefault();gotoView('v7')}
+  if(e.key==='Escape'){$('pal').classList.remove('on');$('purgeconfirm').classList.remove('on')}});
 
 /* V2 live markdown */
 const initMD=`# FRS · Quy trình Báo giá
@@ -739,6 +841,39 @@ $('icstate').onclick=()=>{
   $('icstatetxt').textContent=s.txt;
   $('icbanner').innerHTML=s.banner?`<div class="banner">☁ <span>${s.banner}</span><button class="ghost" onclick="this.parentElement.remove()">Đóng</button></div>`:'';
 };
+
+/* V7 SETTINGS — APP-FR-16; các danh sách mirror đúng SolCommandID + NonPaletteShortcuts (SolCommands.swift / SettingsStore.swift) */
+const CMDS=[
+ ['Chèn bảng','⌘⇧T',false],
+ ['Chèn sol-data block','⌘⇧D',false],
+ ['Xuất snapshot','—',false],
+ ['Tài liệu mới','⌘N',true],
+ ['Chuyển chế độ pane','⌘1/2/3',false],
+ ['Tìm trong tài liệu','⌘F',false],
+ ['Tìm trong workspace','⌘⇧F',true],
+ ['Mở Thùng rác','—',true],
+];
+const NONPAL=[['In đậm','⌘B'],['In nghiêng','⌘I'],['Heading 2','⌘⇧H'],['Danh sách','⌘⇧L'],['Trích dẫn','⌘⇧Q'],['Đóng overlay','Esc'],['Đóng cửa sổ','⌘W'],['Mở Settings','⌘,']];
+const scRow=(t,k)=>`<div class="setrow"><span class="lab">${t}</span><span class="kk">${k}</span></div>`;
+$('shortcuts').innerHTML=CMDS.map(([t,k,m1])=>scRow(t+(m1?'':' · từ M2+'),k)).join('')+NONPAL.map(([t,k])=>scRow(t,k)).join('');
+
+document.querySelectorAll('#thSeg button').forEach(b=>b.onclick=()=>{themePref=b.dataset.th;applyTheme()});
+applyTheme();
+
+document.querySelectorAll('#langSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#langSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  $('langnote').classList.toggle('on',b.dataset.lg!=='vi');
+});
+
+$('setTrash').onclick=()=>gotoView('v6');
+$('setClose').onclick=()=>gotoView('v1');
+
+let tele=true;
+function teleFoot(){$('telefoot').innerHTML=
+  `Lớp 1 (đang <b>${tele?'BẬT':'TẮT'}</b>): crash report và số đếm vận hành — thời lượng sync, mã lỗi, số tài liệu có xung đột. Chỉ là con số, đếm ngay trên máy. Tắt có hiệu lực từ sự kiện kế tiếp.<br>Lớp 2 — <b>KHÔNG BAO GIỜ</b> thu trong mọi trường hợp: nội dung tài liệu, tên file, từ khóa tìm kiếm, dữ liệu CSV. Ràng buộc này nằm trong cấu trúc sự kiện, không phải lời hứa (APP-NFR-08).`}
+$('swTele').onclick=()=>{tele=!tele;$('swTele').classList.toggle('on',tele);$('swTele').setAttribute('aria-checked',tele);teleFoot()};
+$('teleErase').onclick=()=>toast('Đã xóa toàn bộ log telemetry trên máy');
+teleFoot();
 </script>
 </body>
 </html>
