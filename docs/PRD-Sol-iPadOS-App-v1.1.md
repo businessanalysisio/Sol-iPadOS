@@ -6,7 +6,7 @@
 | **Baseline** | **v1.2.1** — v1.2 sau KG-BA Council re-review + 4 CR đã áp (CR-D1 · CR-D2 · CR-D3 · CR-M1) |
 | **Trạng thái** | Đã duyệt — baseline đang thi hành (M0–M5 Lớp 1 đã xanh) |
 | **Chủ sở hữu** | PO Sol |
-| **Tài liệu liên quan** | [`design.md`](design.md) (ADR-D07/D08) · [`sol_ipados_mockups_v3.2_orange.html`](sol_ipados_mockups_v3.2_orange.html) · [`relay-service-spec-v0.1.md`](relay-service-spec-v0.1.md) (v1.0, HR-5) · Kế hoạch `SOL-iPadOS-App-Development-Plan-v1.0.md` |
+| **Tài liệu liên quan** | [`design.md`](design.md) (ADR-D07/D08) · [`sol_ipados_mockups_v3.3_orange.html`](sol_ipados_mockups_v3.3_orange.html) · [`relay-service-spec-v0.1.md`](relay-service-spec-v0.1.md) (v1.0, HR-5) · Kế hoạch `SOL-iPadOS-App-Development-Plan-v1.0.md` |
 
 > **Ghi chú vị trí canonical (05/08/2026):** bản PRD này được **tái lập vào repo** từ bản quản trị tại `E:\Documents\PRD-Sol-iPadOS-App-v1.1.md` cùng toàn bộ dấu vết yêu cầu trong code/test/docs của repo (cùng lý do design.md chuyển vào repo trước đó). **Từ nay sửa đổi qua git.** Một số ít mục không còn dấu vết trong repo được đánh dấu tái lập — xem §14.
 
