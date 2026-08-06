@@ -13,13 +13,11 @@ let package = Package(
     dependencies: [
         .package(path: "../SolStore"),
         .package(path: "../SolDesignSystem"),
-        // Test-only: seed content must parse through the real M2/M3 pipeline.
-        .package(path: "../SolBlockModel"),
-        .package(path: "../SolDataBlocks"),
+        .package(path: "../SolBootcamp"), // seed BA Bootcamp + Bootcamp Board
     ],
     targets: [
-        .target(name: "SolWorkspace", dependencies: ["SolStore", "SolDesignSystem"]),
-        .testTarget(name: "SolWorkspaceTests",
-                    dependencies: ["SolWorkspace", "SolBlockModel", "SolDataBlocks"]),
+        .target(name: "SolWorkspace",
+                dependencies: ["SolStore", "SolDesignSystem", "SolBootcamp"]),
+        .testTarget(name: "SolWorkspaceTests", dependencies: ["SolWorkspace"]),
     ]
 )

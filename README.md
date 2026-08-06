@@ -32,9 +32,10 @@ Sol-iPadOS/
 │   ├── SolBlockModel/         # parser Markdown byte-engine — 1 lượt ra preview tree + gutter tags
 │   ├── SolEditor/             # màn S2: TextKit 2 + gutter theo layout fragment + toolbar
 │   ├── SolDataBlocks/         # màn S3: sol-data → Swift Charts + insight + VoiceOver
-│   ├── SolWorkspace/          # màn S1 + Thùng rác + ⌘K palette + Settings
-│   │                          # + BootcampSeed: bộ tài liệu "BA Bootcamp" (SOL Bootcamp OS)
-│   │                          #   seed 1 lần vào workspace mới (marker .sol-seed-bootcamp-v1)
+│   ├── SolWorkspace/          # màn S1 + Thùng rác + ⌘K palette + Settings + nút Bootcamp Board
+│   ├── SolBootcamp/           # Bootcamp OS: seed "BA Bootcamp" (1 lần, marker .sol-seed-bootcamp-v1),
+│   │                          # backlog engine (parse/đổi status trên chính .md, journal-before-write),
+│   │                          # Dashboard tự tính lại + Bootcamp Board UI
 │   └── SolCollab/             # màn S4 (v1.1): CRDT + relay mock + roster/share sheet — NGOÀI app v1
 ├── docs/                      # design.md, mockups v3.1, relay spec (canonical)
 └── .github/workflows/ci.yml   # macos-15, tự provision simulator iPad gen 10 (HR-4)

@@ -13,6 +13,8 @@ packages:
     path: Packages/SolStore
   SolWorkspace:
     path: Packages/SolWorkspace
+  SolBootcamp:
+    path: Packages/SolBootcamp
   SolBlockModel:
     path: Packages/SolBlockModel
   SolEditor:
@@ -60,6 +62,7 @@ schemes:
         - package: SolDesignSystem/SolDesignSystemTests
         - package: SolStore/SolStoreTests
         - package: SolWorkspace/SolWorkspaceTests
+        - package: SolBootcamp/SolBootcampTests
         - package: SolBlockModel/SolBlockModelTests
         - package: SolEditor/SolEditorTests
         - package: SolDataBlocks/SolDataBlocksTests

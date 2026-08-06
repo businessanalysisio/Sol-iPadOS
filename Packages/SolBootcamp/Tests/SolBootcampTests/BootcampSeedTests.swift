@@ -2,7 +2,7 @@ import XCTest
 import SolStore
 import SolBlockModel
 import SolDataBlocks
-@testable import SolWorkspace
+@testable import SolBootcamp
 
 /// Seed "BA Bootcamp" (SOL Bootcamp OS) — install-once semantics + the seed
 /// content itself must survive the real parse pipeline, not just look right.

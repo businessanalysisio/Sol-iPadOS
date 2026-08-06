@@ -1,4 +1,5 @@
 import SwiftUI
+import SolBootcamp
 import SolStore
 import SolDesignSystem
 
@@ -68,6 +69,12 @@ public struct WorkspaceView: View {
         }
         .background(SolColor.bg)
         .sheet(isPresented: $model.trashVisible) { TrashView(model: model) }
+        .sheet(isPresented: $model.bootcampVisible) {
+            // Board sửa Backlog/Dashboard trên cùng store — refresh khi đóng
+            // để danh sách S1 thấy modifiedAt mới.
+            BootcampBoardView(store: model.store)
+                .onDisappear { model.refreshList() }
+        }
         .sheet(isPresented: $model.settingsVisible) {
             SettingsView(settings: model.settings) { model.trashVisible = true }
         }
@@ -97,6 +104,11 @@ public struct WorkspaceView: View {
                 get: { model.layout == .grid ? 0 : 1 },
                 set: { model.layout = $0 == 0 ? .grid : .list }
             ))
+            if model.bootcampAvailable {
+                Button { model.bootcampVisible = true } label: { Image(systemName: "checklist") }
+                    .foregroundStyle(SolColor.textSecondary)
+                    .accessibilityLabel("Mở Bootcamp Board")
+            }
             Button { model.trashVisible = true } label: { Image(systemName: "trash") }
                 .foregroundStyle(SolColor.textSecondary)
                 .accessibilityLabel("Mở Thùng rác")

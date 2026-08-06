@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SolBootcamp
 import SolStore
 
 /// View-model for màn S1. Owns the store, search state and trash state.
@@ -19,6 +20,9 @@ public final class WorkspaceViewModel {
     public var paletteVisible = false
     public var trashVisible = false
     public var settingsVisible = false
+    public var bootcampVisible = false
+    /// Nút Bootcamp Board chỉ hiện khi workspace thật sự có tài liệu Backlog.
+    public private(set) var bootcampAvailable = false
     public var errorMessage: String?
 
     /// Exposed so the app layer can hand the same store to the editor.
@@ -139,6 +143,7 @@ public final class WorkspaceViewModel {
                 ? try store.listDocuments()
                 : try store.search(query)
             trashItems = try store.listTrash()
+            bootcampAvailable = BootcampBoardViewModel.backlogDocument(in: store) != nil
         } catch DocumentStoreError.fileTooLarge(let limit) {
             errorMessage = "File vượt giới hạn \(limit / 1_048_576) MB (APP-BR-02). Hãy tách nhỏ tài liệu."
         } catch DocumentStoreError.quotaExceeded {
