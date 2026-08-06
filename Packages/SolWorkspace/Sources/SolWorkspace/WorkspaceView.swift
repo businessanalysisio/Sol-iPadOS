@@ -88,6 +88,12 @@ public struct WorkspaceView: View {
         .sheet(isPresented: $model.settingsVisible) {
             SettingsView(settings: model.settings) { model.trashVisible = true }
         }
+        .sheet(item: $model.versionHistoryDoc) { doc in
+            // Khôi phục ghi lại file trên cùng store — refresh khi đóng để
+            // danh sách S1 thấy modifiedAt mới.
+            VersionHistoryView(store: model.store, document: doc)
+                .onDisappear { model.refreshList() }
+        }
         .overlay {
             if model.paletteVisible {
                 CommandPaletteView(model: model)
@@ -155,6 +161,7 @@ public struct WorkspaceView: View {
                         .buttonStyle(.plain)
                         .contextMenu {
                             Button("Mở trong cửa sổ mới") { openWindow(value: doc) }
+                            Button("Lịch sử phiên bản") { model.versionHistoryDoc = doc }
                             Button("Xóa (vào Thùng rác)", role: .destructive) {
                                 model.softDelete(doc)
                             }

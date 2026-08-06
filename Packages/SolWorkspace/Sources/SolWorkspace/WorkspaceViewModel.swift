@@ -22,6 +22,8 @@ public final class WorkspaceViewModel {
     public var settingsVisible = false
     public var bootcampVisible = false
     public var learnVisible = false
+    /// Tài liệu đang xem lịch sử phiên bản (APP-FR-12) — nil = sheet đóng.
+    public var versionHistoryDoc: Document?
     /// Nút Bootcamp Board chỉ hiện khi workspace thật sự có tài liệu Backlog.
     public private(set) var bootcampAvailable = false
     /// Nút Bootcamp Learn chỉ hiện khi workspace thật sự có tài liệu Curriculum.
@@ -58,6 +60,12 @@ public final class WorkspaceViewModel {
             .appendingPathComponent("SolWorkspace", isDirectory: true)
         let location = try WorkspaceLocation.resolve(
             ubiquity: DefaultUbiquityProvider(), localRoot: local)
+        // O13 (APP-FR-15/EMMA-R-03): phiên trước chạy fallback cục bộ mà nay
+        // iCloud đã sẵn sàng → di trú copy-then-delete vào container TRƯỚC khi
+        // mở store; đụng tên lấy hậu tố số, không bao giờ ghi đè.
+        if case .iCloud = location.backing {
+            WorkspaceLocation.migrateIfNeeded(localRoot: local, into: location.root)
+        }
         let dbURL = location.root.appendingPathComponent(".sol-index.sqlite")
         let store = try DocumentStore(root: location.root, index: SearchIndex(databaseURL: dbURL))
         // First open only: seed the BA Bootcamp working set (SOL Bootcamp OS)

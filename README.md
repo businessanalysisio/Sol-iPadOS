@@ -9,8 +9,8 @@ Client native iPadOS của nền tảng SOL (Second Brain & Knowledge Infrastruc
 | Milestone | Trạng thái | Nội dung chính |
 |---|---|---|
 | **M0** — Design System | ✅ Code + CI xanh | Token §2.2–2.4, typography Be Vietnam Pro (ADR-D08, verify 134/134 glyph VN), components §6, contrast §2.5 trong CI. **Còn: record snapshot baseline trên Mac** |
-| **M1** — Workspace + Store | ✅ Code + CI xanh | FTS5 + fold đ/Đ (Phụ lục C), 4 trạng thái iCloud + fallback local (APP-FR-15/AC-09), Thùng rác + purge cascade (APP-FR-17/AC-08), ⌘K palette danh sách đóng Phụ lục A |
-| **M2** — Editor + Block Model | ✅ Code + CI xanh | Parser byte-engine UTF-8 một-lượt (gutter = product truth theo cấu trúc), ~33ms/10k từ Debug sau 3 vòng perf-tripwire, journal-before-write + kill-app recovery, version metadata (actor/timestamp/operation) |
+| **M1** — Workspace + Store | ✅ Code + CI xanh | FTS5 + fold đ/Đ (Phụ lục C), 4 trạng thái iCloud + fallback local (APP-FR-15/AC-09), di trú local→iCloud tự động ở bootstrap (EMMA-R-03), Thùng rác + purge cascade (APP-FR-17/AC-08), ⌘K palette danh sách đóng Phụ lục A |
+| **M2** — Editor + Block Model | ✅ Code + CI xanh | Parser byte-engine UTF-8 một-lượt (gutter = product truth theo cấu trúc), ~33ms/10k từ Debug sau 3 vòng perf-tripwire, journal-before-write + kill-app recovery, version metadata (actor/timestamp/operation) + màn Lịch sử phiên bản với khôi phục an toàn (APP-FR-12) |
 | **M3** — Data Blocks | ✅ Code + CI xanh | `sol-data` → Swift Charts (ramp §2.3), lỗi CSV đúng-nguyên-văn-PRD, downsample ≤200 điểm + ghi chú N/M, insight per-type, VoiceOver ≤25/summary |
 | **M4** — Sync + Conflict | ✅ Lớp 1, CI xanh | ConflictResolver không-merge (tên file khớp APP-BR-03 nguyên văn), SyncEngine protocol + chip 3 trạng thái, multi-window + resolve 2 cửa sổ (M-01). **Còn Lớp 2:** NSFileVersion monitor + e2e iCloud 2 thiết bị (gate APP-AC-03) |
 | **M5** — Live Share | ✅ Lớp 1, CI xanh | SolCollab: TextCRDT (RGA + causal buffering, fuzz 3-actor hội tụ), MockRelayHub = executable reference của SPEC-RELAY §4 (state machine 8 hàng, timer 15' clock-inject, Viewer chặn tại relay). **KHÔNG link vào app v1 (HR-2).** Còn: `CloudflareCollabTransport` khi relay staging (tuần 10) |
@@ -44,7 +44,7 @@ Sol-iPadOS/
 └── .github/workflows/ci.yml   # macos-15, tự provision simulator iPad gen 10 (HR-4)
 ```
 
-24 test suite / ~144 test chạy trên simulator iPad (10th generation) mỗi lần push.
+25 test suite / ~150 test chạy trên simulator iPad (10th generation) mỗi lần push.
 
 ## Thiết lập trên Mac (lần đầu)
 

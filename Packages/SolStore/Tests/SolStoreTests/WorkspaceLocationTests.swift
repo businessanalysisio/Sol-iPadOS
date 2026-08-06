@@ -85,4 +85,32 @@ final class WorkspaceLocationTests: XCTestCase {
         XCTAssertEqual(
             try String(contentsOf: container.appendingPathComponent("FRS 2.md"), encoding: .utf8), "bản local")
     }
+
+    // MARK: Di trú tự động ở bootstrap (O13 — nối migrate vào đường mở app)
+
+    func testMigrateIfNeededMovesWorkspaceAndRemovesEmptyLocalRoot() throws {
+        try FileManager.default.createDirectory(at: localRoot, withIntermediateDirectories: true)
+        try "nội dung".write(to: localRoot.appendingPathComponent("Ghi chú.md"),
+                             atomically: true, encoding: .utf8)
+
+        XCTAssertEqual(WorkspaceLocation.migrateIfNeeded(localRoot: localRoot, into: container), 1)
+
+        XCTAssertEqual(
+            try String(contentsOf: container.appendingPathComponent("Ghi chú.md"), encoding: .utf8),
+            "nội dung")
+        // Thư mục local đã rỗng thì bị gỡ — lần mở sau không di trú lại.
+        XCTAssertFalse(FileManager.default.fileExists(atPath: localRoot.path))
+        XCTAssertEqual(WorkspaceLocation.migrateIfNeeded(localRoot: localRoot, into: container), 0)
+    }
+
+    func testMigrateIfNeededIsNoopWhenLocalRootMissingOrEmpty() throws {
+        // Chưa từng có workspace cục bộ (cài mới khi iCloud sẵn sàng).
+        XCTAssertEqual(WorkspaceLocation.migrateIfNeeded(localRoot: localRoot, into: container), 0)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: container.path),
+                       "no-op thì không được tạo gì trong container")
+
+        // Thư mục cục bộ rỗng cũng là no-op (không có gì để mất).
+        try FileManager.default.createDirectory(at: localRoot, withIntermediateDirectories: true)
+        XCTAssertEqual(WorkspaceLocation.migrateIfNeeded(localRoot: localRoot, into: container), 0)
+    }
 }

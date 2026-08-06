@@ -40,7 +40,7 @@ public final class JournalStore {
 
 /// Version history with the v1 auditability floor — APP-FR-12 (DAVID-01):
 /// every version carries actor / timestamp / operation.
-public struct VersionMeta: Codable, Equatable, Identifiable {
+public struct VersionMeta: Codable, Equatable, Hashable, Identifiable {
     public enum Operation: String, Codable { case edit, restore, conflictCopy, importExternal, snapshot }
     public let id: String
     public let docID: String

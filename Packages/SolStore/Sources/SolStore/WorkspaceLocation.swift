@@ -50,6 +50,25 @@ public struct WorkspaceLocation {
         }
     }
 
+    /// Bootstrap entry point (O13): when a previous session ran on the local
+    /// fallback and iCloud has since become available, move that workspace
+    /// into the container. Best-effort and re-runnable: a mid-migration error
+    /// leaves the remaining files in place for the next launch; the local
+    /// root directory itself is removed only once it is fully empty (so the
+    /// migration never re-triggers on an already-migrated workspace).
+    @discardableResult
+    public static func migrateIfNeeded(localRoot: URL, into containerRoot: URL,
+                                       fileManager: FileManager = .default) -> Int {
+        guard let items = try? fileManager.contentsOfDirectory(atPath: localRoot.path),
+              !items.isEmpty else { return 0 }
+        let moved = (try? migrate(localRoot: localRoot, into: containerRoot,
+                                  fileManager: fileManager))?.count ?? 0
+        if (try? fileManager.contentsOfDirectory(atPath: localRoot.path))?.isEmpty == true {
+            try? fileManager.removeItem(at: localRoot)
+        }
+        return moved
+    }
+
     /// Migrates every file from a local workspace into the iCloud container.
     /// PRD v1.2 APP-FR-15 (EMMA-R-03): never overwrite — name collisions in a
     /// non-empty container get the APP-FR-03 numeric suffix (not a conflicted

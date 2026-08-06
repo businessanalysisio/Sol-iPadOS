@@ -57,14 +57,15 @@ fallback cục bộ kèm lý do · **O6** banner xung đột nêu tên file bả
 lưu Board/Learn: "Không lưu được thay đổi — journal vẫn giữ nội dung.") ·
 **O8** tiến độ học tập + nội dung bài + điểm quiz (đúng/tổng, ngưỡng 70%) ·
 **O9a** Dashboard Bootcamp tự tính · **O9b** Thùng rác 30 ngày kèm hạn xóa ·
-**O10** lịch sử phiên bản *(kho D5 đã ghi đầy đủ actor/timestamp/operation;
-UI xem lịch sử **chưa có ở v1** — đầu ra tiềm năng, không vẽ trong sơ đồ)*.
+**O10** lịch sử phiên bản (ai · lúc nào · thao tác) — màn Lịch sử phiên bản từ
+context menu S1, kèm khôi phục có lưới an toàn *(nối vào v1 sau thẩm định
+Bước 5 — `VersionHistoryView`)*.
 
 Tới E2/E3: **O11** file .md đã lưu (gồm Backlog.md, Curriculum.md đã cập nhật
 status/score) · **O12** file bản sao xung đột (.md sibling, không merge —
-ADR-A02) · **O13** di trú workspace local → iCloud *(API
-`WorkspaceLocation.migrate` copy-then-delete sẵn sàng; **chưa nối vào
-bootstrap ở v1** — không vẽ trong sơ đồ)* · **O14** snapshot .md trong
+ADR-A02) · **O13** di trú workspace local → iCloud (copy-then-delete, đụng
+tên lấy hậu tố số) *(nối vào bootstrap sau thẩm định Bước 5 —
+`WorkspaceLocation.migrateIfNeeded`)* · **O14** snapshot .md trong
 `Snapshots/` chia sẻ qua Files.app.
 
 ---
@@ -83,14 +84,12 @@ flowchart LR
     P0(("0<br/>Sol — Không gian<br/>làm việc của Analyst"))
 
     E1 -- "I1–I9: nội dung soạn thảo · lệnh tài liệu · truy vấn tìm kiếm ⌘K<br/>khối sol-data · trạng thái mục Backlog · trạng thái bài học<br/>đáp án quiz · cài đặt · quyết định xung đột" --> P0
-    P0 -- "O1–O9: preview + gutter · chart + insight<br/>danh sách & kết quả tìm · chip đồng bộ<br/>banner fallback/xung đột · thông báo lỗi hành động được<br/>tiến độ học + điểm quiz · Dashboard + Thùng rác" --> E1
+    P0 -- "O1–O10: preview + gutter · chart + insight<br/>danh sách & kết quả tìm · chip đồng bộ<br/>banner fallback/xung đột · thông báo lỗi hành động được<br/>tiến độ học + điểm quiz · Dashboard + Thùng rác<br/>lịch sử phiên bản + khôi phục" --> E1
     E2 -- "I10–I14: trạng thái iCloud · tín hiệu sync<br/>file .md từ thiết bị khác · phiên bản xung đột · lỗi dung lượng" --> P0
-    P0 -- "O11, O12: file .md đã lưu (gồm Backlog, Curriculum)<br/>bản sao xung đột" --> E2
+    P0 -- "O11–O13: file .md đã lưu (gồm Backlog, Curriculum)<br/>bản sao xung đột · di trú workspace local → iCloud" --> E2
     E3 -- "I12: file .md tạo/sửa ngoài app" --> P0
     P0 -- "O14: snapshot .md chia sẻ" --> E3
 ```
-
-*(O10, O13 không vẽ — chưa được nối vào v1, xem chú thích ở Bước 1.)*
 
 ---
 
@@ -121,7 +120,7 @@ Mọi đường **cập nhật** file của 2.0/3.0/6.0/7.0 đều đi qua 4.0.
 | D2 | Sidecar định danh (UUID ↔ file, self-heal) — *chỉ trong bảng* | `<root>/.sol-ids/` |
 | D3 | Chỉ mục FTS5 (fold dấu + đ/Đ) | `<root>/.sol-index.sqlite` |
 | D4 | Journal pending (journal-before-write) | `<root>/.sol-journal/` |
-| D5 | Lịch sử version (actor/timestamp/operation) — **chỉ-ghi ở v1** (UI lịch sử chưa có) | `<root>/.sol-versions/` |
+| D5 | Lịch sử version (actor/timestamp/operation) — đọc bởi 2.0 (màn Lịch sử phiên bản, O10) | `<root>/.sol-versions/` |
 | D6 | Thùng rác (30 ngày) | `<root>/.sol-trash/` |
 | D7 | Snapshots xuất ra (read-only, chia sẻ qua Files.app) | `<root>/Snapshots/` |
 | D8 | Marker seed (2 file: `.sol-seed-bootcamp-v1`, `.sol-seed-learn-v1`) | `<root>/` |
@@ -146,13 +145,14 @@ flowchart TB
     D1[("D1 · Tài liệu .md<br/>D1a Backlog · D1b Dashboard<br/>D1c Curriculum · D1d Module 1–5")]
     D3[("D3 · FTS index")]
     D4[("D4 · Journal")]
-    D5[("D5 · Versions<br/>(chỉ-ghi ở v1)")]
+    D5[("D5 · Versions")]
     D6[("D6 · Thùng rác")]
     D7[("D7 · Snapshots")]
     D8[("D8 · Seed markers")]
     D11[("D11 · CSV nguồn")]
 
     E2 -- "I10: trạng thái ubiquity (chọn root)" --> P1
+    P1 -- "O13: workspace cục bộ di trú<br/>(copy-then-delete, hậu tố khi đụng tên)" --> E2
     P1 -- "bộ 6+4 tài liệu seed (1 lần)" --> D1
     D8 -- "trạng thái đã-seed" --> P1
     P1 -- "marker .sol-seed-*-v1" --> D8
@@ -166,7 +166,9 @@ flowchart TB
     P2 -- "mục xóa mềm" --> D6
     D6 -- "TrashItem + hạn xóa 30 ngày" --> P2
     E3 -- "I12: file .md tạo/sửa ngoài app (self-heal)" --> P2
-    P2 -- "O3–O7, O9b: danh sách & kết quả tìm · chip đồng bộ ·<br/>banner fallback/xung đột · lỗi hành động được · thùng rác" --> E1
+    D5 -- "danh sách version + nội dung bản cũ" --> P2
+    P2 -- "nội dung phiên bản khôi phục (+ bản an toàn)" --> P4
+    P2 -- "O3–O7, O9b, O10: danh sách & kết quả tìm · chip đồng bộ ·<br/>banner fallback/xung đột · lỗi hành động được ·<br/>thùng rác · lịch sử phiên bản" --> E1
     P2 -- "Document được chọn" --> P3
 
     E1 -- "I1, I4: nội dung soạn thảo · khối sol-data" --> P3
@@ -206,6 +208,7 @@ flowchart TB
 | Từ | Tới | Dữ liệu | Mã cấp 0 |
 | --- | --- | --- | --- |
 | E2 | 1.0 | Trạng thái ubiquity (chọn root) | I10 |
+| 1.0 | E2 | Workspace cục bộ di trú vào container (copy-then-delete) | O13 |
 | 1.0 | D1 | Bộ 6+4 tài liệu seed (1 lần) | — |
 | D8 | 1.0 | Trạng thái đã-seed | — |
 | 1.0 | D8 | Marker `.sol-seed-*-v1` | — |
@@ -218,7 +221,9 @@ flowchart TB
 | 2.0 | D6 | Mục xóa mềm | — |
 | D6 | 2.0 | TrashItem + hạn xóa 30 ngày | — |
 | E3 | 2.0 | File .md tạo/sửa ngoài app (self-heal sidecar + index) | I12 |
-| 2.0 | E1 | Danh sách & kết quả tìm · chip · banner · lỗi · thùng rác | O3–O7, O9b |
+| D5 | 2.0 | Danh sách version + nội dung bản cũ | — |
+| 2.0 | 4.0 | Nội dung phiên bản khôi phục (+ bản an toàn `.edit`) | — |
+| 2.0 | E1 | Danh sách & kết quả tìm · chip · banner · lỗi · thùng rác · lịch sử phiên bản | O3–O7, O9b, O10 |
 | 2.0 | 3.0 | Document được chọn | — |
 | E1 | 3.0 | Nội dung soạn thảo · khối sol-data | I1, I4 |
 | D11 | 3.0 | Nội dung CSV | — |
@@ -353,8 +358,11 @@ trong bản này.
 - [x] **Cân bằng cấp 0 ↔ cấp 1** — bản nháp mất E3 + 5 luồng (I9, I14, O7,
       O10, O13); đã sửa: E3/D7 vào sơ đồ cấp 1, thêm I9 (E1 → 5.0), I14 vào
       nhãn E2 → 5.0, O7 vào nhãn 2.0/7.0 → E1; O10 và O13 xác minh là **chưa
-      nối vào v1** (versions.list chỉ gọi từ test; `migrate` không có caller
-      production) → chú thích rõ ở Bước 1 và loại khỏi sơ đồ.
+      nối vào v1** tại thời điểm thẩm định (versions.list chỉ gọi từ test;
+      `migrate` không có caller production) → phát hiện này trở thành backlog
+      và **đã được phát triển ngay sau đó**: `VersionHistoryView` (O10) +
+      `WorkspaceLocation.migrateIfNeeded` trong bootstrap (O13); sơ đồ đã vẽ
+      lại hai luồng này.
 - [x] **Cân bằng cấp 1 ↔ cấp 2 (7.0)** — bản nháp mâu thuẫn mô hình ghi
       (cấp 1 qua 4.0, cấp 2 ghi thẳng kho); đã thống nhất: 4.0 là process
       logic dùng chung, cấp 2 vẽ node ranh giới 4.0, bỏ D4/D5/D3 khỏi sơ đồ
@@ -363,9 +371,9 @@ trong bản này.
 - [x] **Không có black hole / miracle** — 7 process cấp 1 và 7 sub-process
       cấp 2 đều có luồng vào và ra.
 - [x] **Không có luồng entity↔entity hay store↔store** không qua process.
-- [x] **Kho có người đọc + người ghi** — đã thêm D4 → 4.0 (phục hồi journal);
-      miễn trừ có chú thích: D1d chỉ đọc sau seed · D5, D9 chỉ-ghi ở v1 ·
-      D11 do E3 ghi từ ngoài đường biên.
+- [x] **Kho có người đọc + người ghi** — đã thêm D4 → 4.0 (phục hồi journal)
+      và D5 → 2.0 (màn Lịch sử phiên bản); miễn trừ có chú thích: D1d chỉ đọc
+      sau seed · D9 chỉ-ghi ở v1 · D11 do E3 ghi từ ngoài đường biên.
 - [x] **Nhãn luồng là danh từ dữ liệu** — đã danh-từ-hóa (~9 nhãn động từ:
       "mở màn Learn" → "phiên xem Learn", "chạm bài học" → "ID bài học được
       chọn", "cập nhật chỉ mục" → "cặp index cập nhật", …), tách 3 luồng
@@ -383,9 +391,12 @@ trong bản này.
 
 ### Hạn chế còn ghi nhận (không chặn)
 
-- O10 (UI lịch sử phiên bản) và O13 (di trú local → iCloud) là **đầu ra tiềm
-  năng**: kho/API đã sẵn, chưa nối vào app v1 — khi nối, thêm lại vào sơ đồ
-  cấp 0/1 (D5 → 2.0 và 1.0 → E2).
+- ~~O10 và O13 là đầu ra tiềm năng~~ — **đã phát triển**: màn Lịch sử phiên
+  bản (context menu S1 → xem version theo actor/thao tác → khôi phục có lưới
+  an toàn không-mất-chữ) và di trú local → iCloud tự động ở bootstrap
+  (best-effort, chạy lại được sau lỗi giữa chừng). Sơ đồ cấp 0/1 đã cập nhật
+  (D5 → 2.0 và 1.0 → E2) — đúng vòng đời DFD: thẩm định phát hiện lỗ hổng,
+  lỗ hổng thành backlog, code đổi thì sơ đồ đổi theo.
 - DFD cấp 2 chỉ phân rã 7.0; nếu cần dạy/thẩm định 6.0 Board, phân rã tương
   tự (6.1 parse → 6.2 roll-up → 6.3 sửa status → 6.4 tái sinh Dashboard →
   6.5 ủy quyền 4.0).
