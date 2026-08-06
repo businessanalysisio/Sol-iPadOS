@@ -33,6 +33,8 @@ Sol-iPadOS/
 │   ├── SolEditor/             # màn S2: TextKit 2 + gutter theo layout fragment + toolbar
 │   ├── SolDataBlocks/         # màn S3: sol-data → Swift Charts + insight + VoiceOver
 │   ├── SolWorkspace/          # màn S1 + Thùng rác + ⌘K palette + Settings
+│   │                          # + BootcampSeed: bộ tài liệu "BA Bootcamp" (SOL Bootcamp OS)
+│   │                          #   seed 1 lần vào workspace mới (marker .sol-seed-bootcamp-v1)
 │   └── SolCollab/             # màn S4 (v1.1): CRDT + relay mock + roster/share sheet — NGOÀI app v1
 ├── docs/                      # design.md, mockups v3.1, relay spec (canonical)
 └── .github/workflows/ci.yml   # macos-15, tự provision simulator iPad gen 10 (HR-4)

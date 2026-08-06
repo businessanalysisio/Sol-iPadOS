@@ -53,6 +53,9 @@ public final class WorkspaceViewModel {
             ubiquity: DefaultUbiquityProvider(), localRoot: local)
         let dbURL = location.root.appendingPathComponent(".sol-index.sqlite")
         let store = try DocumentStore(root: location.root, index: SearchIndex(databaseURL: dbURL))
+        // First open only: seed the BA Bootcamp working set (SOL Bootcamp OS).
+        // Best-effort — a seeding failure must never block the workspace.
+        try? BootcampSeed.installIfNeeded(into: store)
         let engine: SyncEngine? = location.backing == .iCloud ? ICloudSyncEngine() : nil
         let telemetry = try? TelemetryLog(
             directory: location.root.appendingPathComponent(".sol-telemetry", isDirectory: true))
