@@ -4,7 +4,7 @@ Client native iPadOS của nền tảng SOL (Second Brain & Knowledge Infrastruc
 
 **Hồ sơ quản trị:** PRD baseline **v1.2.1** (`E:\Documents\PRD-Sol-iPadOS-App-v1.1.md` — giữ tên file cũ) · Kế hoạch (`SOL-iPadOS-App-Development-Plan-v1.0.md`) · Biên bản KG-BA Council + re-review. **Tài liệu canonical trong repo:** [`docs/design.md`](docs/design.md) (ADR-D07/D08) · [`docs/sol_ipados_mockups_v3.1_orange.html`](docs/sol_ipados_mockups_v3.1_orange.html) · [`docs/relay-service-spec-v0.1.md`](docs/relay-service-spec-v0.1.md) (v1.0, HR-5 đã duyệt).
 
-## Trạng thái milestone (04/08/2026)
+## Trạng thái milestone (06/08/2026)
 
 | Milestone | Trạng thái | Nội dung chính |
 |---|---|---|
@@ -15,6 +15,7 @@ Client native iPadOS của nền tảng SOL (Second Brain & Knowledge Infrastruc
 | **M4** — Sync + Conflict | ✅ Lớp 1, CI xanh | ConflictResolver không-merge (tên file khớp APP-BR-03 nguyên văn), SyncEngine protocol + chip 3 trạng thái, multi-window + resolve 2 cửa sổ (M-01). **Còn Lớp 2:** NSFileVersion monitor + e2e iCloud 2 thiết bị (gate APP-AC-03) |
 | **M5** — Live Share | ✅ Lớp 1, CI xanh | SolCollab: TextCRDT (RGA + causal buffering, fuzz 3-actor hội tụ), MockRelayHub = executable reference của SPEC-RELAY §4 (state machine 8 hàng, timer 15' clock-inject, Viewer chặn tại relay). **KHÔNG link vào app v1 (HR-2).** Còn: `CloudflareCollabTransport` khi relay staging (tuần 10) |
 | Settings (APP-FR-16) | ✅ Hoàn chỉnh | Theme instant, ngôn ngữ + restart notice, phím tắt từ nguồn danh sách đóng, telemetry 2 lớp cưỡng chế bằng type system (APP-NFR-08) |
+| **Bootcamp OS + Learn** | ✅ Code + CI xanh | Board: tap-to-update status trên Backlog .md, Dashboard tự tính lại. **Learn (LMS):** giáo trình 12 tuần seed (5 module · 29 mục · 970 phút), bài học Why/What/How/Action, quiz chấm ngay trong app (đạt ≥70%), tiến độ + điểm ghi phẫu thuật vào chính Curriculum .md (journal-before-write) |
 | **M6** — Hoàn thiện | ⬜ Chưa bắt đầu | A11y audit Phụ lục D, perf Release trên thiết bị, TestFlight |
 
 **Sổ quyết định PO: 6/6 đã chốt** — HR-1 Be Vietnam Pro · HR-2 Live Share=v1.1 · HR-3 Confidential (cảnh báo relay+SIN, không label v1) · HR-4 iPadOS 17/iPad gen 10 · HR-5 relay=Cloudflare Durable Objects · HR-6 presence palette. 4 CR (D1/D2/D3/M1) đã áp.
@@ -36,12 +37,14 @@ Sol-iPadOS/
 │   ├── SolBootcamp/           # Bootcamp OS: seed "BA Bootcamp" (1 lần, marker .sol-seed-bootcamp-v1),
 │   │                          # backlog engine (parse/đổi status trên chính .md, journal-before-write),
 │   │                          # Dashboard tự tính lại + Bootcamp Board UI
+│   │                          # + Bootcamp Learn (LMS): seed giáo trình 12 tuần (.sol-seed-learn-v1),
+│   │                          # curriculum/quiz engine trên .md, LearnView (bài học + quiz + tiến độ)
 │   └── SolCollab/             # màn S4 (v1.1): CRDT + relay mock + roster/share sheet — NGOÀI app v1
 ├── docs/                      # design.md, mockups v3.1, relay spec (canonical)
 └── .github/workflows/ci.yml   # macos-15, tự provision simulator iPad gen 10 (HR-4)
 ```
 
-17 test suite / ~95 test chạy trên simulator iPad (10th generation) mỗi lần push.
+24 test suite / ~144 test chạy trên simulator iPad (10th generation) mỗi lần push.
 
 ## Thiết lập trên Mac (lần đầu)
 

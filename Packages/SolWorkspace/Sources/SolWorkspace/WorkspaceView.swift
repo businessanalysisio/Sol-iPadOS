@@ -75,6 +75,16 @@ public struct WorkspaceView: View {
             BootcampBoardView(store: model.store)
                 .onDisappear { model.refreshList() }
         }
+        .sheet(isPresented: $model.learnVisible) {
+            // Learn ghi Curriculum trên cùng store — refresh khi đóng để S1
+            // thấy modifiedAt mới; "Mở trong Editor" đóng sheet rồi hand off
+            // Document cho app layer như mọi cú mở tài liệu khác.
+            LearnView(store: model.store) { doc in
+                model.learnVisible = false
+                onOpen(doc)
+            }
+            .onDisappear { model.refreshList() }
+        }
         .sheet(isPresented: $model.settingsVisible) {
             SettingsView(settings: model.settings) { model.trashVisible = true }
         }
@@ -104,6 +114,11 @@ public struct WorkspaceView: View {
                 get: { model.layout == .grid ? 0 : 1 },
                 set: { model.layout = $0 == 0 ? .grid : .list }
             ))
+            if model.learnAvailable {
+                Button { model.learnVisible = true } label: { Image(systemName: "graduationcap") }
+                    .foregroundStyle(SolColor.textSecondary)
+                    .accessibilityLabel("Mở Bootcamp Learn")
+            }
             if model.bootcampAvailable {
                 Button { model.bootcampVisible = true } label: { Image(systemName: "checklist") }
                     .foregroundStyle(SolColor.textSecondary)

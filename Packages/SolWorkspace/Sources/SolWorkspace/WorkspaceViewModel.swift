@@ -21,8 +21,11 @@ public final class WorkspaceViewModel {
     public var trashVisible = false
     public var settingsVisible = false
     public var bootcampVisible = false
+    public var learnVisible = false
     /// Nút Bootcamp Board chỉ hiện khi workspace thật sự có tài liệu Backlog.
     public private(set) var bootcampAvailable = false
+    /// Nút Bootcamp Learn chỉ hiện khi workspace thật sự có tài liệu Curriculum.
+    public private(set) var learnAvailable = false
     public var errorMessage: String?
 
     /// Exposed so the app layer can hand the same store to the editor.
@@ -57,9 +60,12 @@ public final class WorkspaceViewModel {
             ubiquity: DefaultUbiquityProvider(), localRoot: local)
         let dbURL = location.root.appendingPathComponent(".sol-index.sqlite")
         let store = try DocumentStore(root: location.root, index: SearchIndex(databaseURL: dbURL))
-        // First open only: seed the BA Bootcamp working set (SOL Bootcamp OS).
+        // First open only: seed the BA Bootcamp working set (SOL Bootcamp OS)
+        // + the Learn curriculum. Markers are separate so a workspace seeded
+        // before Bootcamp Learn shipped still receives the curriculum here.
         // Best-effort — a seeding failure must never block the workspace.
         try? BootcampSeed.installIfNeeded(into: store)
+        try? LearnSeed.installIfNeeded(into: store)
         let engine: SyncEngine? = location.backing == .iCloud ? ICloudSyncEngine() : nil
         let telemetry = try? TelemetryLog(
             directory: location.root.appendingPathComponent(".sol-telemetry", isDirectory: true))
@@ -144,6 +150,7 @@ public final class WorkspaceViewModel {
                 : try store.search(query)
             trashItems = try store.listTrash()
             bootcampAvailable = BootcampBoardViewModel.backlogDocument(in: store) != nil
+            learnAvailable = LearnViewModel.curriculumDocument(in: store) != nil
         } catch DocumentStoreError.fileTooLarge(let limit) {
             errorMessage = "File vượt giới hạn \(limit / 1_048_576) MB (APP-BR-02). Hãy tách nhỏ tài liệu."
         } catch DocumentStoreError.quotaExceeded {
